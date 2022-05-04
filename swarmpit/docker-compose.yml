@@ -38,6 +38,9 @@ services:
           memory: 256M
         reservations:
           memory: 128M
+      placement:
+        constraints:
+          - node.role == manager
 
   influxdb:
     image: influxdb:1.7
@@ -51,6 +54,9 @@ services:
           memory: 256M
         reservations:
           memory: 128M
+      placement:
+        constraints:
+          - node.role == manager
 
   agent:
     image: swarmpit/agent:latest
