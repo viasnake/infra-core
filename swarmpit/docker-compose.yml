@@ -4,7 +4,7 @@ services:
   app:
     image: swarmpit/swarmpit:latest
     environment:
-      - SWARMPIT_DB=http://db:5984
+      - SWARMPIT_DB=http://couchdb:5984
       - SWARMPIT_INFLUXDB=http://influxdb:8086
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -26,10 +26,10 @@ services:
       placement:
         constraints:
           - node.role == manager
-  db:
+  couchdb:
     image: treehouses/couchdb:2.3.1
     volumes:
-      - db-data:/opt/couchdb/data
+      - couch-data:/opt/couchdb/data
     networks:
       - net
     deploy:
@@ -81,7 +81,7 @@ networks:
     driver: overlay
 
 volumes:
-  db-data:
+  couch-data:
     driver: local
   influx-data:
     driver: local
