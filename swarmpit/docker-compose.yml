@@ -1,84 +1,94 @@
 version: '3.3'
 
 services:
+
   app:
     image: swarmpit/swarmpit:latest
-    environment:
-      - SWARMPIT_DB=http://couchdb:5984
-      - SWARMPIT_INFLUXDB=http://influxdb:8086
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - 888:8080
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test:
+       - CMD
+       - curl
+       - -f
+       - http://localhost:8080
       interval: 60s
       timeout: 10s
       retries: 3
+    environment:
+      SWARMPIT_DB: http://couchdb:5984
+      SWARMPIT_INFLUXDB: http://influxdb:8086
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - net
+     - public
+     - net
     deploy:
+      labels:
+        caddy: ${HOSTNAME}
+        caddy.reverse_proxy: '{{upstreams 8080}}'
+      placement:
+        constraints:
+         - node.role == manager
       resources:
-        limits:
-          memory: 1024M
         reservations:
           memory: 512M
-      placement:
-        constraints:
-          - node.role == manager
-  couchdb:
-    image: treehouses/couchdb:2.3.1
-    volumes:
-      - couch-data:/opt/couchdb/data
-    networks:
-      - net
-    deploy:
-      resources:
         limits:
-          memory: 256M
-        reservations:
-          memory: 128M
-      placement:
-        constraints:
-          - node.role == manager
-
-  influxdb:
-    image: influxdb:1.7
-    volumes:
-      - influx-data:/var/lib/influxdb
-    networks:
-      - net
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
-      placement:
-        constraints:
-          - node.role == manager
+          memory: 1024M
 
   agent:
     image: swarmpit/agent:latest
     environment:
-      - DOCKER_API_VERSION=1.35
+      DOCKER_API_VERSION: '1.35'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+     - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - net
+     - net
     deploy:
       mode: global
       labels:
         swarmpit.agent: 'true'
       resources:
-        limits:
-          memory: 64M
         reservations:
           memory: 32M
+        limits:
+          memory: 64M
+
+  couchdb:
+    image: treehouses/couchdb:2.3.1
+    volumes:
+     - couch-data:/opt/couchdb/data
+    networks:
+     - net
+    deploy:
+      placement:
+        constraints:
+         - node.role == manager
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          memory: 256M
+
+  influxdb:
+    image: influxdb:1.7
+    volumes:
+     - influx-data:/var/lib/influxdb
+    networks:
+     - net
+    deploy:
+      placement:
+        constraints:
+         - node.role == manager
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          memory: 256M
 
 networks:
   net:
     driver: overlay
+  public:
+    external: true
 
 volumes:
   couch-data:
