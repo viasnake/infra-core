@@ -11,8 +11,6 @@ services:
     networks:
      - public
     deploy:
-      labels:
-        caddy.email: ${email}
       placement:
         constraints:
          - node.role == manager
