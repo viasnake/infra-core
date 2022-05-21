@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+
+  viasnake:
+    image: ghost:alpine
+    restart: always
+    ports:
+      - 49600:2368
+    environment:
+      - database__client=mysql
+      - database__connection__host=192.168.10.2
+      - database__connection__user=www
+      - database__connection__password=dENSGvJ3TeKOCzHd
+      - database__connection__database=viasnake
+      - url=https://viasnake.com
+      - mail__transport=SMTP
+      - mail__options__host=smtp.gmail.com
+      - mail__options__port=587
+      - mail__options__auth__user=xeumrs@gmail.com
+      - mail__options__auth__pass=mlazmjqfipqypzds
+      - mail__from=no-reply@viasnake.com
+    volumes:
+      - /var/ghost:/var/lib/ghost/content
+
+  mcplay:
+    image: ghost:alpine
+    restart: always
+    ports:
+      - 49601:2368
+    environment:
+      - database__client=mysql
+      - database__connection__host=192.168.10.2
+      - database__connection__user=www
+      - database__connection__password=dENSGvJ3TeKOCzHd
+      - database__connection__database=mcplay
+      - url=https://www.mcplay.biz
+      - mail__transport=SMTP
+      - mail__options__host=smtp.gmail.com
+      - mail__options__port=587
+      - mail__options__auth__user=xeumrs@gmail.com
+      - mail__options__auth__pass=mlazmjqfipqypzds
+      - mail__from=no-reply@mcplay.biz
+    volumes:
+      - /var/ghost:/var/lib/ghost/content

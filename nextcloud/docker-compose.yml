@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+
+  nextcloud:
+    image: nextcloud:apache
+    container_name: nextcloud
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - /mnt/hdd/nextcloud:/var/www/html/data
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      OVERWRITEHOST: ${OVERWRITEHOST}
+      OVERWRITEPROTOCOL: ${OVERWRITEPROTOCOL}
