@@ -12,3 +12,13 @@ services:
     environment:
       INFRARED_CONFIG_PATH: "/configs"
       INFRARED_RECEIVE_PROXY_PROTOCOL: "true"
+    networks:
+     - public
+    deploy:
+      placement:
+        constraints:
+         - node.role == worker
+
+networks:
+  public:
+    external: true
