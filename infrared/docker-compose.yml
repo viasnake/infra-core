@@ -8,7 +8,7 @@ services:
     ports:
       - 25565:25565/tcp
     volumes:
-      - /shared/infrared/configs:/configs
+      - /mnt/shared/infrared/configs:/configs
     environment:
       INFRARED_CONFIG_PATH: "/configs"
       INFRARED_RECEIVE_PROXY_PROTOCOL: "true"
