@@ -5,8 +5,6 @@ services:
     image: haveachin/infrared:latest
     stdin_open: true
     tty: true
-    ports:
-      - 25565:25565/tcp
     volumes:
       - /mnt/shared/infrared/configs:/configs
     environment:
@@ -15,9 +13,9 @@ services:
     networks:
      - public
     deploy:
-      placement:
-        constraints:
-         - node.role == worker
+      labels:
+        caddy: ${HOSTNAME}
+        caddy.reverse_proxy: '{{upstreams 25565}}'
 
 networks:
   public:
