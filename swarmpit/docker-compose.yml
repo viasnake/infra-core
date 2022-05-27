@@ -20,7 +20,7 @@ services:
      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
      - public
-     - net
+     - swarmpit
     deploy:
       labels:
         caddy: ${HOSTNAME}
@@ -41,7 +41,7 @@ services:
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-     - net
+     - swarmpit
     deploy:
       mode: global
       labels:
@@ -57,7 +57,7 @@ services:
     volumes:
      - /mnt/shared/couch-data:/opt/couchdb/data
     networks:
-     - net
+     - swarmpit
     deploy:
       resources:
         reservations:
@@ -70,7 +70,7 @@ services:
     volumes:
      - /mnt/shared/influx-data:/var/lib/influxdb
     networks:
-     - net
+     - swarmpit
     deploy:
       resources:
         reservations:
@@ -79,7 +79,7 @@ services:
           memory: 256M
 
 networks:
-  net:
+  swarmpit:
     driver: overlay
   public:
     external: true
