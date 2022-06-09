@@ -1,20 +1,19 @@
-version: '3'
+version: '3.3'
 
 services:
   infrared:
-    image: haveachin/infrared:latest
-    stdin_open: true
+    image: ghcr.io/viasnake/infrared-arm64:latest
     tty: true
-    volumes:
-      - /mnt/shared/infrared/configs:/configs
     environment:
-      INFRARED_CONFIG_PATH: '/configs'
+      INFRARED_CONFIG_PATH: /configs
       INFRARED_RECEIVE_PROXY_PROTOCOL: 'true'
+    volumes:
+     - /mnt/configs:/configs
     networks:
      - public
     deploy:
       labels:
-        caddy: ${HOSTNAME}
+        caddy: :25565
         caddy.reverse_proxy: '{{upstreams 25565}}'
 
 networks:
