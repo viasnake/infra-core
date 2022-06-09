@@ -55,10 +55,13 @@ services:
   couchdb:
     image: treehouses/couchdb:2.3.1
     volumes:
-     - /mnt/shared/couch-data:/opt/couchdb/data
+     - couchdb-data:/opt/couchdb/data
     networks:
      - swarmpit
     deploy:
+      placement:
+        constraints:
+         - node.role == manager
       resources:
         reservations:
           memory: 128M
@@ -68,10 +71,13 @@ services:
   influxdb:
     image: influxdb:1.7
     volumes:
-     - /mnt/shared/influx-data:/var/lib/influxdb
+     - influx-data:/var/lib/influxdb
     networks:
      - swarmpit
     deploy:
+      placement:
+        constraints:
+         - node.role == manager
       resources:
         reservations:
           memory: 128M
@@ -83,3 +89,9 @@ networks:
     driver: overlay
   public:
     external: true
+
+volumes:
+  couchdb-data:
+    driver: local
+  influx-data:
+    driver: local
