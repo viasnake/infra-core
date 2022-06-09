@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 services:
   infrared:
@@ -8,8 +8,8 @@ services:
     volumes:
       - /mnt/shared/infrared/configs:/configs
     environment:
-      INFRARED_CONFIG_PATH: "/configs"
-      INFRARED_RECEIVE_PROXY_PROTOCOL: "true"
+      INFRARED_CONFIG_PATH: '/configs'
+      INFRARED_RECEIVE_PROXY_PROTOCOL: 'true'
     networks:
      - public
     deploy:
