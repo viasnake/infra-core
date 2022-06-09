@@ -1,6 +1,23 @@
 version: '3.3'
 
 services:
+  agent:
+    image: swarmpit/agent:latest
+    environment:
+      DOCKER_API_VERSION: '1.35'
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+     - swarmpit
+    deploy:
+      mode: global
+      labels:
+        swarmpit.agent: 'true'
+      resources:
+        reservations:
+          memory: 32M
+        limits:
+          memory: 64M
 
   app:
     image: swarmpit/swarmpit:latest
@@ -33,24 +50,6 @@ services:
           memory: 512M
         limits:
           memory: 1024M
-
-  agent:
-    image: swarmpit/agent:latest
-    environment:
-      DOCKER_API_VERSION: '1.35'
-    volumes:
-     - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-     - swarmpit
-    deploy:
-      mode: global
-      labels:
-        swarmpit.agent: 'true'
-      resources:
-        reservations:
-          memory: 32M
-        limits:
-          memory: 64M
 
   couchdb:
     image: treehouses/couchdb:2.3.1
@@ -85,10 +84,10 @@ services:
           memory: 256M
 
 networks:
-  swarmpit:
-    driver: overlay
   public:
     external: true
+  swarmpit:
+    driver: overlay
 
 volumes:
   couchdb-data:

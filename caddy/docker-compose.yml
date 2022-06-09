@@ -23,9 +23,11 @@ services:
         reservations:
           cpus: '0.1'
           memory: 200M
+
 networks:
   public:
     external: true
+
 volumes:
   caddy-data:
     driver: local
