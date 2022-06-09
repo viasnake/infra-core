@@ -3,6 +3,8 @@ version: '3.3'
 services:
   caddy:
     image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    environment:
+      CADDY_INGRESS_NETWORKS: public
     ports:
      - 80:80
      - 443:443
