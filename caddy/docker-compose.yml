@@ -14,6 +14,8 @@ services:
     networks:
      - public
     deploy:
+      labels:
+        caddy.email: support@alflag.org
       placement:
         constraints:
          - node.role == manager
