@@ -40,7 +40,7 @@ services:
      - swarmpit
     deploy:
       labels:
-        caddy: ${HOSTNAME}
+        caddy: swarmpit.sys.alflag.org
         caddy.reverse_proxy: '{{upstreams 8080}}'
       placement:
         constraints:
