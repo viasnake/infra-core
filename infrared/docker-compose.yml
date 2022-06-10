@@ -3,7 +3,6 @@ version: '3.3'
 services:
   infrared:
     image: ghcr.io/viasnake/infrared-arm64:latest
-    tty: true
     environment:
       INFRARED_CONFIG_PATH: /configs
     ports:
