@@ -11,9 +11,10 @@ services:
     networks:
      - public
     deploy:
-      labels:
-        caddy: :25565
-        caddy.reverse_proxy: '{{upstreams 25565}}'
+      mode: global
+      placement:
+        constraints:
+         - node.role == worker
 
 networks:
   public:
