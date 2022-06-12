@@ -7,6 +7,8 @@ services:
     networks:
      - public
      - local
+    volumes:
+      - /mnt/shared/mcplaynetwork-web/content:/var/lib/ghost/content
     environment:
       database__client: mysql
       database__connection__host: db
