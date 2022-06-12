@@ -37,7 +37,7 @@ services:
      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
      - public
-     - swarmpit
+     - local
     deploy:
       labels:
         caddy: swarmpit.sys.alflag.org
@@ -56,7 +56,7 @@ services:
     volumes:
      - /mnt/shared/couchdb-data:/opt/couchdb/data
     networks:
-     - swarmpit
+     - local
     deploy:
       resources:
         reservations:
@@ -69,7 +69,7 @@ services:
     volumes:
      - /mnt/shared/influx-data:/var/lib/influxdb
     networks:
-     - swarmpit
+     - local
     deploy:
       resources:
         reservations:
@@ -80,5 +80,5 @@ services:
 networks:
   public:
     external: true
-  swarmpit:
+  local:
     driver: overlay
