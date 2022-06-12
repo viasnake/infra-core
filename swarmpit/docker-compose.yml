@@ -54,7 +54,7 @@ services:
   couchdb:
     image: treehouses/couchdb:2.3.1
     volumes:
-     - /mnt/shared/couchdb-data:/opt/couchdb/data
+     - /mnt/shared/swarmpit/couchdb-data:/opt/couchdb/data
     networks:
      - local
     deploy:
@@ -67,7 +67,7 @@ services:
   influxdb:
     image: influxdb:1.7
     volumes:
-     - /mnt/shared/influx-data:/var/lib/influxdb
+     - /mnt/shared/swarmpit/influx-data:/var/lib/influxdb
     networks:
      - local
     deploy:

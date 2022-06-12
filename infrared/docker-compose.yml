@@ -8,7 +8,7 @@ services:
     ports:
      - 25565:25565
     volumes:
-     - /mnt/shared/infrared:/configs
+     - /mnt/shared/infrared/configs:/configs
     networks:
      - public
     deploy:
