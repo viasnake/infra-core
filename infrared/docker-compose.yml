@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.9'
 
 services:
   proxy:
@@ -12,8 +12,9 @@ services:
     networks:
      - public
     deploy:
-      mode: global
+      replicas: 2
       placement:
+        max_replicas_per_node: 2
         constraints:
          - node.role == worker
 
