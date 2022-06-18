@@ -1,0 +1,48 @@
+version: '3.8'
+
+x-envionment:
+  db:
+    MYSQL_PASSWORD: &MYSQL_PASSWORD "CHANGE_ME"
+    MYSQL_ROOT_PASSWORD: &MYSQL_ROOT_PASSWORD "CHANGE_ME"
+  caddy:
+    CF: &CADDY_CF "cloudflare CHANGE_ME"
+
+services:
+
+  ghost:
+    image: ghost:5-alpine
+    networks:
+     - public
+     - local
+    volumes:
+      - /mnt/shared/viasnake-web/content:/var/lib/ghost/content
+    environment:
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: ghost
+      database__connection__password: *MYSQL_PASSWORD
+      database__connection__database: ghost
+      url: https://viasnake.com
+    deploy:
+      labels:
+        caddy: viasnake.com www.viasnake.com
+        caddy.reverse_proxy: '{{upstreams 2368}}'
+        caddy.tls.dns: *CADDY_CF
+
+  db:
+    image: mariadb:10.7
+    networks:
+     - local
+    volumes:
+      - /mnt/shared/viasnake-web/mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ghost
+      MYSQL_USER: ghost
+      MYSQL_PASSWORD: *MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: *MYSQL_ROOT_PASSWORD
+
+networks:
+  public:
+    external: true
+  local:
+    driver: overlay
