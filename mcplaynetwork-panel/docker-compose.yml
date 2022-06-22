@@ -47,6 +47,10 @@ services:
     networks:
       - local
       - public
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplayhosting-panel/logs"
+        target: "/app/storage/logs"
     environment:
       <<: *panel
       APP_ENV: production
@@ -58,10 +62,6 @@ services:
       QUEUE_DRIVER: redis
       REDIS_HOST: cache
       SESSION_DRIVER: redis
-    volumes:
-      - type: bind
-        source: "/mnt/shared/mcplayhosting-panel/logs"
-        target: "/app/storage/logs"
     deploy:
       labels:
         <<: *label
