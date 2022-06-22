@@ -9,10 +9,12 @@ services:
       POSTGRES_USER: wikijs
     logging:
       driver: 'none'
-    volumes:
-      - /mnt/shared/docs/postgresql-data:/var/lib/postgresql/data
     networks:
      - local
+    volumes:
+      - type: bind
+        source: "/mnt/shared/docs/postgresql-data"
+        target: "/var/lib/postgresql/data"
 
   wiki:
     image: ghcr.io/requarks/wiki:2
