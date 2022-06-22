@@ -6,11 +6,16 @@ services:
     environment:
       INFRARED_CONFIG_PATH: /configs
     ports:
-     - 25565:25565
-    volumes:
-     - /mnt/shared/infrared/configs:/configs
+      - published: 25565
+        target: 25565
+        protocol: tcp
+        mode: ingress
     networks:
      - public
+    volumes:
+      - type: bind
+        source: "/mnt/shared/infrared/configs"
+        target: "/configs"
     deploy:
       replicas: 2
       placement:
