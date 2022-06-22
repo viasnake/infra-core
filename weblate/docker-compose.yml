@@ -48,7 +48,7 @@ services:
       - type: tmpfs
         target: "/app/cache"
     environment:
-      <<: [*db, *cache, *webalte]
+      <<: [*db, *cache, *weblate]
 
   db:
     image: postgres:14-alpine
