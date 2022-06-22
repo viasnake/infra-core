@@ -36,7 +36,9 @@ services:
     networks:
       - local
     volumes:
-      - /mnt/shared/mcplayhosting-panel/db:/var/lib/mysql
+      - type: bind
+        source: "/mnt/shared/mcplayhosting-panel/db"
+        target: "/var/lib/mysql"
     environment:
       <<: *db
 
@@ -56,9 +58,10 @@ services:
       QUEUE_DRIVER: redis
       REDIS_HOST: cache
       SESSION_DRIVER: redis
-
     volumes:
-      - /mnt/shared/mcplayhosting-panel/logs:/app/storage/logs
+      - type: bind
+        source: "/mnt/shared/mcplayhosting-panel/logs"
+        target: "/app/storage/logs"
     deploy:
       labels:
         <<: *label
