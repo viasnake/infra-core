@@ -5,7 +5,7 @@ services:
     image: postgres:11-alpine
     environment:
       POSTGRES_DB: wiki
-      POSTGRES_PASSWORD: ghiP8hLfhQFG
+      POSTGRES_PASSWORD: "CHANGE_ME"
       POSTGRES_USER: wikijs
     logging:
       driver: 'none'
@@ -21,7 +21,7 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: wikijs
-      DB_PASS: ghiP8hLfhQFG
+      DB_PASS: "CHANGE_ME"
       DB_NAME: wiki
     networks:
      - public
