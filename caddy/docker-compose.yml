@@ -1,9 +1,12 @@
 version: '3.8'
 
 x-envionment:
-  proxy:
-    &proxy
+  caddy:
+    &caddy
     CADDY_INGRESS_NETWORKS: public
+  label:
+    &label
+    caddy.email: support@alflag.org
 
 services:
   caddy:
@@ -27,10 +30,10 @@ services:
         source: "/mnt/shared/caddy/data"
         target: "/data"
     environment:
-      <<: *proxy
+      <<: *caddy
     deploy:
       labels:
-        caddy.email: support@alflag.org
+        <<: *label
       placement:
         constraints:
          - node.role == manager
