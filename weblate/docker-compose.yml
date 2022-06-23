@@ -32,8 +32,11 @@ x-envionment:
     WEBLATE_SITE_TITLE: "Alflag Translate"
     WEBLATE_DEFAULT_COMMITER_NAME: Alflag
     WEBLATE_DEFAULT_COMMITER_EMAIL: admin@alflag.org
-  caddy:
-    CF: &CADDY_CF "cloudflare CHANGE_ME"
+  label:
+    &label
+    caddy: translate.alflag.org
+    caddy.reverse_proxy: '{{upstreams 8080}}'
+    caddy.tls.dns: "cloudflare CHANGE_ME"
 
 services:
   weblate:
@@ -50,6 +53,9 @@ services:
         target: "/app/cache"
     environment:
       <<: [*db, *cache, *weblate]
+    deploy:
+      labels:
+        <<: *label
 
   db:
     image: postgres:14-alpine
