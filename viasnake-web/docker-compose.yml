@@ -20,7 +20,9 @@ services:
      - public
      - local
     volumes:
-      - /mnt/shared/viasnake-web/content:/var/lib/ghost/content
+      - type: bind
+        source: "/mnt/shared/viasnake-web/content"
+        target: "/var/lib/ghost/content"
     environment:
       database__client: mysql
       database__connection__host: db
@@ -37,7 +39,9 @@ services:
     networks:
      - local
     volumes:
-      - /mnt/shared/viasnake-web/mysql:/var/lib/mysql
+      - type: bind
+        source: "/mnt/shared/viasnake-web/mysql"
+        target: "/var/lib/mysql"
     environment:
       <<: *db
 
