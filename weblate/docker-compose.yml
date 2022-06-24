@@ -30,7 +30,7 @@ x-envionment:
     WEBLATE_GITHUB_TOKEN: ${WEBLATE_GITHUB_TOKEN}
     WEBLATE_AUTO_UPDATE: "true"
     WEBLATE_SITE_TITLE: "Alflag Translate"
-    WEBLATE_DEFAULT_COMMITER_NAME: Alflag
+    WEBLATE_DEFAULT_COMMITER_NAME: Alflag translate
     WEBLATE_DEFAULT_COMMITER_EMAIL: admin@alflag.org
   label:
     &label
