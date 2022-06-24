@@ -32,6 +32,7 @@ x-envionment:
     WEBLATE_SITE_TITLE: "Alflag Translate"
     WEBLATE_DEFAULT_COMMITER_NAME: Alflag translate
     WEBLATE_DEFAULT_COMMITER_EMAIL: admin@alflag.org
+    MT_DEEPL_API_URL: "https://api-free.deepl.com/v2/"
   label:
     &label
     caddy: translate.alflag.org
