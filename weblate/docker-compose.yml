@@ -7,6 +7,7 @@ x-envionment:
     POSTGRES_DATABASE: weblate
     POSTGRES_USER: weblate
     POSTGRES_PASSWORD: "CHANGE_ME"
+    POSTGRES_PORT: 5432
   cache:
     &cache
     REDIS_HOST: cache
@@ -27,12 +28,16 @@ x-envionment:
     WEBLATE_ADMIN_EMAIL: ${WEBLATE_ADMIN_EMAIL}
     WEBLATE_GITHUB_USERNAME: ${WEBLATE_GITHUB_USERNAME}
     WEBLATE_GITHUB_TOKEN: ${WEBLATE_GITHUB_TOKEN}
-    WEBLATE_AUTO_UPDATE: true
+    WEBLATE_AUTO_UPDATE: "true"
     WEBLATE_SITE_TITLE: "Alflag Translate"
-    WEBLATE_DEFAULT_COMMITER_NAME: Alflag
+    WEBLATE_DEFAULT_COMMITER_NAME: Alflag translate
     WEBLATE_DEFAULT_COMMITER_EMAIL: admin@alflag.org
-  caddy:
-    CF: &CADDY_CF "cloudflare CHANGE_ME"
+    MT_DEEPL_API_URL: "https://api-free.deepl.com/v2/"
+  label:
+    &label
+    caddy: translate.alflag.org
+    caddy.reverse_proxy: '{{upstreams 8080}}'
+    caddy.tls.dns: "cloudflare CHANGE_ME"
 
 services:
   weblate:
@@ -48,7 +53,10 @@ services:
       - type: tmpfs
         target: "/app/cache"
     environment:
-      <<: [*db, *cache, *webalte]
+      <<: [*db, *cache, *weblate]
+    deploy:
+      labels:
+        <<: *label
 
   db:
     image: postgres:14-alpine
