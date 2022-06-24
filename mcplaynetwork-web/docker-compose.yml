@@ -1,7 +1,19 @@
-version: '3.3'
+version: '3.8'
+
+x-envionment:
+  db:
+    &db
+    MYSQL_ROOT_PASSWORD: &db_password "CHANGE_ME"
+  ghost:
+    &ghost
+    url: https://www2.mcplay.biz
+  label:
+    &label
+    caddy: www2.mcplay.biz
+    caddy.reverse_proxy: "{{upstreams 2368}}"
+    caddy.tls.dns: "CHANGE_ME"
 
 services:
-
   ghost:
     image: ghost:5-alpine
     networks:
@@ -13,14 +25,12 @@ services:
       database__client: mysql
       database__connection__host: db
       database__connection__user: root
-      database__connection__password: "CHANGE_ME"
+      database__connection__password: *db_password
       database__connection__database: ghost
-      url: https://www2.mcplay.biz
+      <<: *ghost
     deploy:
       labels:
-        caddy: www2.mcplay.biz
-        caddy.reverse_proxy: '{{upstreams 2368}}'
-        caddy.tls.dns: "CHANGE_ME"
+        <<: *label
 
   db:
     image: mariadb:10.7
@@ -29,7 +39,7 @@ services:
     volumes:
       - /mnt/shared/mcplaynetwork-web/mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "CHANGE_ME"
+      <<: *db
 
 networks:
   public:
