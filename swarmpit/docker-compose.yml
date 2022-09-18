@@ -1,4 +1,11 @@
-version: '3.3'
+version: '3.8'
+
+x-envionment:
+  label:
+    &label
+    caddy: swarmpit.sys.alflag.org
+    caddy.reverse_proxy: "{{upstreams 8080}}"
+    caddy.tls.dns: acme
 
 services:
   agent:
@@ -46,8 +53,7 @@ services:
       - local
     deploy:
       labels:
-        caddy: swarmpit.sys.alflag.org
-        caddy.reverse_proxy: '{{upstreams 8080}}'
+        *label
       placement:
         constraints:
           - node.role == manager
