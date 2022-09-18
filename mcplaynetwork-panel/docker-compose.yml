@@ -11,7 +11,7 @@ x-envionment:
     APP_KEY: "CHANGE_ME"
     APP_SERVICE_AUTHOR: support@mcplay.biz
     APP_TIMEZONE: Asia/Tokyo
-    APP_URL: https://panel.viasnake.com
+    APP_URL: https://panel.mcplay.biz
     MAIL_DRIVER: smtp
     MAIL_ENCRYPTION: 'true'
     MAIL_FROM: support@mcplay.biz
