@@ -6,10 +6,10 @@ x-envionment:
     MYSQL_ROOT_PASSWORD: &db_password "CHANGE_ME"
   ghost:
     &ghost
-    url: https://www2.mcplay.biz
+    url: https://www.mcplay.biz
   label:
     &label
-    caddy: www2.mcplay.biz
+    caddy: www.mcplay.biz
     caddy.reverse_proxy: "{{upstreams 2368}}"
 
 services:
