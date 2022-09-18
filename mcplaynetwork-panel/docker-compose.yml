@@ -8,6 +8,7 @@ x-envionment:
     MYSQL_USER: pterodactyl
     MYSQL_PASSWORD: &db_password "CHANGE_ME"
   panel:
+    &panel
     APP_KEY: "CHANGE_ME"
     APP_SERVICE_AUTHOR: support@mcplay.biz
     APP_TIMEZONE: Asia/Tokyo
