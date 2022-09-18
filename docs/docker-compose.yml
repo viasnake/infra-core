@@ -1,36 +1,46 @@
-version: '3'
+version: '3.8'
+
+x-envionment:
+  db:
+    &db
+    POSTGRES_DB: &DB wiki
+    POSTGRES_PASSWORD: &PASSWORD "CHANGE_ME"
+    POSTGRES_USER: &USER wikijs
+  wiki:
+    &wiki
+    DB_TYPE: postgres
+    DB_HOST: db
+    DB_PORT: 5432
+    DB_USER: *USER
+    DB_PASS: *PASSWORD
+    DB_NAME: *DB
+  label:
+    &label
+    caddy: docs.alflag.org
+    caddy.reverse_proxy: "{{upstreams 3000}}"
 
 services:
   db:
     image: postgres:11-alpine
-    environment:
-      POSTGRES_DB: wiki
-      POSTGRES_PASSWORD: ghiP8hLfhQFG
-      POSTGRES_USER: wikijs
-    logging:
-      driver: 'none'
-    volumes:
-      - /mnt/shared/docs/postgresql-data:/var/lib/postgresql/data
     networks:
      - local
+    volumes:
+      - type: bind
+        source: "/mnt/shared/docs/postgresql-data"
+        target: "/var/lib/postgresql/data"
+    environment:
+      <<: *db
 
   wiki:
     image: ghcr.io/requarks/wiki:2
-    environment:
-      DB_TYPE: postgres
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: wikijs
-      DB_PASS: ghiP8hLfhQFG
-      DB_NAME: wiki
     networks:
      - public
      - local
+    environment:
+      <<: *wiki
     deploy:
       labels:
-        caddy: docs.alflag.org
-        caddy.reverse_proxy: '{{upstreams 3000}}'
-        caddy.tls.dns: 'cloudflare {env.CF_API_TOKEN}'
+        <<: *label
 
 networks:
   public:

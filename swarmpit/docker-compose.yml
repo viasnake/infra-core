@@ -1,4 +1,11 @@
-version: '3.3'
+version: '3.8'
+
+x-envionment:
+  label:
+    &label
+    caddy: swarmpit.sys.alflag.org
+    caddy.reverse_proxy: "{{upstreams 8080}}"
+    caddy.tls.dns: acme
 
 services:
   agent:
@@ -6,9 +13,12 @@ services:
     environment:
       DOCKER_API_VERSION: '1.35'
     volumes:
-     - /var/run/docker.sock:/var/run/docker.sock:ro
+      - type: bind
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+        read_only: true
     networks:
-     - local
+      - local
     deploy:
       mode: global
       labels:
@@ -23,10 +33,10 @@ services:
     image: swarmpit/swarmpit:latest
     healthcheck:
       test:
-       - CMD
-       - curl
-       - -f
-       - http://localhost:8080
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8080
       interval: 60s
       timeout: 10s
       retries: 3
@@ -34,17 +44,19 @@ services:
       SWARMPIT_DB: http://couchdb:5984
       SWARMPIT_INFLUXDB: http://influxdb:8086
     volumes:
-     - /var/run/docker.sock:/var/run/docker.sock:ro
+      - type: bind
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+        read_only: true
     networks:
-     - public
-     - local
+      - public
+      - local
     deploy:
       labels:
-        caddy: swarmpit.sys.alflag.org
-        caddy.reverse_proxy: '{{upstreams 8080}}'
+        *label
       placement:
         constraints:
-         - node.role == manager
+          - node.role == manager
       resources:
         reservations:
           memory: 512M
@@ -54,9 +66,11 @@ services:
   couchdb:
     image: treehouses/couchdb:2.3.1
     volumes:
-     - /mnt/shared/swarmpit/couchdb-data:/opt/couchdb/data
+      - type: bind
+        source: "/mnt/shared/swarmpit/couchdb-data"
+        target: "/opt/couchdb/data"
     networks:
-     - local
+      - local
     deploy:
       resources:
         reservations:
@@ -67,9 +81,11 @@ services:
   influxdb:
     image: influxdb:1.7
     volumes:
-     - /mnt/shared/swarmpit/influx-data:/var/lib/influxdb
+      - type: bind
+        source: "/mnt/shared/swarmpit/influx-data"
+        target: "/var/lib/influxdb"
     networks:
-     - local
+      - local
     deploy:
       resources:
         reservations:

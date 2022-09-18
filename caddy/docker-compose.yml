@@ -1,21 +1,40 @@
-version: '3.3'
+version: '3.8'
+
+x-envionment:
+  caddy:
+    &caddy
+    CADDY_INGRESS_NETWORKS: public
+  label:
+    &label
+    caddy.email: support@alflag.org
+    caddy.tls.dns: "cloudflare CHANGE_ME"
 
 services:
   caddy:
     image: ghcr.io/alflag-team/caddy-cloudflare:latest
-    environment:
-      CADDY_INGRESS_NETWORKS: public
     ports:
-     - 80:80
-     - 443:443
-    volumes:
-     - /var/run/docker.sock:/var/run/docker.sock
-     - /mnt/shared/caddy/data:/data
+      - published: 80
+        target: 80
+        protocol: tcp
+        mode: ingress
+      - published: 443
+        target: 443
+        protocol: tcp
+        mode: ingress
     networks:
      - public
+    volumes:
+      - type: bind
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+      - type: bind
+        source: "/mnt/shared/caddy/data"
+        target: "/data"
+    environment:
+      <<: *caddy
     deploy:
       labels:
-        caddy.email: support@alflag.org
+        <<: *label
       placement:
         constraints:
          - node.role == manager

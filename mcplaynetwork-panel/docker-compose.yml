@@ -2,15 +2,27 @@ version: '3.8'
 
 x-envionment:
   db:
-    MYSQL_PASSWORD: &mysql_password "CHANGE_ME"
-    MYSQL_ROOT_PASSWORD: &mysql_root_password "CHANGE_ME"
+    &db
+    MYSQL_DATABASE: panel
+    MYSQL_ROOT_PASSWORD: "CHANGE_ME"
+    MYSQL_USER: pterodactyl
+    MYSQL_PASSWORD: &db_password "CHANGE_ME"
   panel:
-    APP_KEY: &APP_KEY "CHANGE_ME"
-  caddy:
-    CF: &CADDY_CF "cloudflare CHANGE_ME"
+    APP_KEY: "CHANGE_ME"
+    APP_SERVICE_AUTHOR: support@mcplay.biz
+    APP_TIMEZONE: Asia/Tokyo
+    APP_URL: https://panel.viasnake.com
+    MAIL_DRIVER: smtp
+    MAIL_ENCRYPTION: 'true'
+    MAIL_FROM: support@mcplay.biz
+    MAIL_HOST: smtp.google.com
+    MAIL_PORT: '25'
+  label:
+    &label
+    caddy: panel.mcplay.biz
+    caddy.reverse_proxy: '{{upstreams}}'
 
 services:
-
   cache:
     image: redis:alpine
     networks:
@@ -22,45 +34,36 @@ services:
       - --default-authentication-plugin=mysql_native_password
     networks:
       - local
-    environment:
-      MYSQL_DATABASE: panel
-      MYSQL_PASSWORD: *mysql_password
-      MYSQL_ROOT_PASSWORD: *mysql_root_password
-      MYSQL_USER: pterodactyl
     volumes:
-      - /mnt/shared/mcplayhosting-panel/db:/var/lib/mysql
+      - type: bind
+        source: "/mnt/shared/mcplayhosting-panel/db"
+        target: "/var/lib/mysql"
+    environment:
+      <<: *db
 
   panel:
     image: ghcr.io/mcplaynetwork/panel:develop
     networks:
       - local
       - public
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplayhosting-panel/logs"
+        target: "/app/storage/logs"
     environment:
+      <<: *panel
       APP_ENV: production
       APP_ENVIRONMENT_ONLY: 'false'
-      APP_KEY: *APP_KEY
-      APP_SERVICE_AUTHOR: support@mcplay.biz
-      APP_TIMEZONE: Asia/Tokyo
-      APP_URL: https://panel.viasnake.com
-      CACHE_DRIVER: redis
       DB_HOST: db
-      DB_PASSWORD: *mysql_password
+      DB_PASSWORD: *db_password
       DB_PORT: '3306'
-      MAIL_DRIVER: smtp
-      MAIL_ENCRYPTION: 'true'
-      MAIL_FROM: support@mcplay.biz
-      MAIL_HOST: smtp.google.com
-      MAIL_PORT: '25'
+      CACHE_DRIVER: redis
       QUEUE_DRIVER: redis
       REDIS_HOST: cache
       SESSION_DRIVER: redis
-    volumes:
-      - /mnt/shared/mcplayhosting-panel/logs:/app/storage/logs
     deploy:
       labels:
-        caddy: panel.mcplay.biz
-        caddy.reverse_proxy: '{{upstreams}}'
-        caddy.tls.dns: *CADDY_CF
+        <<: *label
 
 networks:
   local:
