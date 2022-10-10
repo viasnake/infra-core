@@ -22,6 +22,7 @@ x-envionment:
     &label
     caddy: panel.mcplay.biz
     caddy.reverse_proxy: '{{upstreams}}'
+    caddy.tls.dns: "cloudflare {env.CF_API_TOKEN}"
 
 services:
   cache:

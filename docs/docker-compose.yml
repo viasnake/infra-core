@@ -18,6 +18,7 @@ x-envionment:
     &label
     caddy: docs.alflag.org
     caddy.reverse_proxy: "{{upstreams 3000}}"
+    caddy.tls.dns: "cloudflare {env.CF_API_TOKEN}"
 
 services:
   db:

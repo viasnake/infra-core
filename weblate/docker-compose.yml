@@ -37,6 +37,7 @@ x-envionment:
     &label
     caddy: translate.alflag.org
     caddy.reverse_proxy: '{{upstreams 8080}}'
+    caddy.tls.dns: "cloudflare {env.CF_API_TOKEN}"
 
 services:
   weblate:

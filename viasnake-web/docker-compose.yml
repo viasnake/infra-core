@@ -11,6 +11,7 @@ x-envionment:
     &label
     caddy: viasnake.com www.viasnake.com
     caddy.reverse_proxy: "{{upstreams 2368}}"
+    caddy.tls.dns: "cloudflare {env.CF_API_TOKEN}"
 
 services:
   ghost:

@@ -7,7 +7,6 @@ x-envionment:
   label:
     &label
     caddy.email: support@alflag.org
-    caddy.tls.dns: "cloudflare CHANGE_ME"
 
 services:
   caddy:
