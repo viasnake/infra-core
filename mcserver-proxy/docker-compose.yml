@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+
+  proxy:
+    image: ghcr.io/viasnake/mcserver-proxy
+    ports:
+      - target: 25565
+        published: 25565
+        protocol: tcp
+        mode: host
+      - target: 19132
+        published: 19132
+        protocol: udp
+        mode: host
+    environment:
+      - JE_BACKEND_ADDRESS=131.147.128.213
+      - JE_BACKEND_PORT=25565
+      - BE_BACKEND_ADDRESS=127.0.0.1
+      - BE_BACKEND_PORT=19132
+    deploy:
+      mode: global
