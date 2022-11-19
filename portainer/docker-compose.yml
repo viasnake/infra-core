@@ -25,7 +25,7 @@ services:
           - node.platform.os == linux
 
   portainer:
-    image: portainer/portainer-ce:2.16.1
+    image: portainer/portainer-ee:2.16.1
     command: -H tcp://tasks.agent:9001 --tlsskipverify
     networks:
       - local
