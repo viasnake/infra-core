@@ -3,22 +3,22 @@ version: '3.8'
 x-envionment:
   db:
     &db
-    POSTGRES_DB: &DB wiki
-    POSTGRES_PASSWORD: &PASSWORD "CHANGE_ME"
-    POSTGRES_USER: &USER wikijs
+    POSTGRES_DB: &db wiki
+    POSTGRES_PASSWORD: &db_password ${DB_PASSWORD}
+    POSTGRES_USER: &db_user wikijs
   wiki:
     &wiki
     DB_TYPE: postgres
     DB_HOST: db
     DB_PORT: 5432
-    DB_USER: *USER
-    DB_PASS: *PASSWORD
-    DB_NAME: *DB
+    DB_USER: *db_user
+    DB_PASS: *db_password
+    DB_NAME: *db
   label:
     &label
     caddy: docs.alflag.org
     caddy.reverse_proxy: "{{upstreams 3000}}"
-    caddy.tls.dns: "cloudflare {env.CF_API_TOKEN}"
+    caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
 
 services:
   db:
