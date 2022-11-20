@@ -1,39 +1,16 @@
 version: '3.8'
 
-x-envionment:
-  db:
-    &db
-    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    MYSQL_DATABASE: &db_database "flarum"
-    MYSQL_USER: &db_user "flarum"
-    MYSQL_PASSWORD: &db_password ${MYSQL_PASSWORD}
-  flarum:
-    &flarum
-    DEBUG: "false"
-    FORUM_URL: https://bp-forum.net
-    DB_HOST: db
-    DB_NAME: *db_database
-    DB_USER: *db_user
-    DB_PASS: *db_password
-    DB_PREF: flarum_
-    DB_PORT: 3306
-    FLARUM_ADMIN_USER: admin
-    FLARUM_ADMIN_PASS: ${FLARUM_ADMIN_PASS}
-    FLARUM_ADMIN_MAIL: admin@alflag.org
-    FLARUM_TITLE: BlueProtocol Forum
-
-  label:
-    &label
-    caddy: bp-forum.net
-    caddy.reverse_proxy: "{{upstreams 8888}}"
-
 services:
+
   db:
     image: mariadb:10.5
     networks:
      - local
     environment:
-      <<: *db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: flarum
+      MYSQL_USER: flarum
+      MYSQL_PASSWORD: &db_password ${MYSQL_PASSWORD}
     volumes:
       - type: bind
         source: "/mnt/shared/bp-forum/mysql"
@@ -42,10 +19,21 @@ services:
   flarum:
     image: ghcr.io/viasnake/flarum:stable
     networks:
-     - public
-     - local
+      - public
+      - local
     environment:
-      <<: *flarum
+      DEBUG: "false"
+      FORUM_URL: https://bp-forum.net
+      DB_HOST: db
+      DB_NAME: flarum
+      DB_USER: flarum
+      DB_PASS: *db_password
+      DB_PREF: flarum_
+      DB_PORT: 3306
+      # FLARUM_ADMIN_USER: admin
+      # FLARUM_ADMIN_PASS: ${FLARUM_ADMIN_PASS}
+      # FLARUM_ADMIN_MAIL: admin@alflag.org
+      FLARUM_TITLE: BlueProtocol Forum
     volumes:
       - type: bind
         source: "/mnt/shared/bp-forum/flarum/assets"
@@ -61,7 +49,9 @@ services:
         target: "/etc/nginx/flarum"
     deploy:
       labels:
-        <<: *label
+        caddy: bp-forum.net
+        caddy.reverse_proxy: "{{upstreams 8888}}"
+        caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
 
 networks:
   public:
