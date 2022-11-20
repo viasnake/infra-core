@@ -1,14 +1,7 @@
 version: '3.8'
 
-x-envionment:
-  caddy:
-    &caddy
-    CADDY_INGRESS_NETWORKS: public
-  label:
-    &label
-    caddy.email: support@alflag.org
-
 services:
+
   caddy:
     image: ghcr.io/alflag-team/caddy-cloudflare:latest
     ports:
@@ -27,13 +20,13 @@ services:
         source: "/var/run/docker.sock"
         target: "/var/run/docker.sock"
       - type: bind
-        source: "/mnt/shared/caddy/data"
+        source: "/mnt/shared/alflag-caddy/data"
         target: "/data"
     environment:
-      <<: *caddy
+      CADDY_INGRESS_NETWORKS: public
     deploy:
       labels:
-        <<: *label
+        caddy.email: support@alflag.org
       placement:
         constraints:
          - node.role == manager
