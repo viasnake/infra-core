@@ -1,19 +1,21 @@
 version: '3.8'
 
-x-envionment:
-  db:
-    &db
-    MYSQL_ROOT_PASSWORD: &db_password "${MYSQL_ROOT_PASSWORD}"
-  ghost:
-    &ghost
-    url: https://www.mcplay.biz
-  label:
-    &label
-    caddy: www.mcplay.biz
-    caddy.reverse_proxy: "{{upstreams 2368}}"
-    caddy.tls.dns: "cloudflare {env.CF_API_TOKEN}"
-
 services:
+
+  db:
+    image: mysql:8
+    networks:
+     - local
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-web/db"
+        target: "/var/lib/mysql"
+    environment:
+      MYSQL_DATABASE: ghost
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: ghost
+      MYSQL_PASSWORD: &db_password ${DB_PASSWORD}
+
   ghost:
     image: ghost:5-alpine
     networks:
@@ -21,29 +23,20 @@ services:
      - local
     volumes:
       - type: bind
-        source: "/mnt/shared/mcplaynetwork-web/content"
+        source: "/mnt/shared/mcplaynetwork-web/ghost"
         target: "/var/lib/ghost/content"
     environment:
       database__client: mysql
       database__connection__host: db
-      database__connection__user: root
+      database__connection__user: ghost
       database__connection__password: *db_password
       database__connection__database: ghost
-      <<: *ghost
+      url: https://www.mcplay.biz
     deploy:
       labels:
-        <<: *label
-
-  db:
-    image: mariadb:10.7
-    networks:
-     - local
-    volumes:
-      - type: bind
-        source: "/mnt/shared/mcplaynetwork-web/mysql"
-        target: "/var/lib/mysql"
-    environment:
-      <<: *db
+        caddy: www.mcplay.biz mcplay.biz
+        caddy.reverse_proxy: "{{upstreams 2368}}"
+        caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
 
 networks:
   public:
