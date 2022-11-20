@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+
+  db:
+    image: mysql:8
+    networks:
+      - local
+    volumes:
+      - type: bind
+        source: "/mnt/shared/viasnake-web/db"
+        target: "/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ghost
+      MYSQL_USER: ghost
+      MYSQL_PASSWORD: &db_password ${MYSQL_PASSWORD}
+
   ghost:
     image: ghost:5-alpine
     networks:
@@ -22,20 +37,6 @@ services:
         caddy: viasnake.com www.viasnake.com
         caddy.reverse_proxy: "{{upstreams 2368}}"
         caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
-
-  db:
-    image: mysql:8
-    networks:
-      - local
-    volumes:
-      - type: bind
-        source: "/mnt/shared/viasnake-web/db"
-        target: "/var/lib/mysql"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ghost
-      MYSQL_USER: ghost
-      MYSQL_PASSWORD: &db_password ${MYSQL_PASSWORD}
 
 networks:
   public:
