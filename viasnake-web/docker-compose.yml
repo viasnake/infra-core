@@ -11,10 +11,7 @@ services:
         source: "/mnt/shared/viasnake-web/db"
         target: "/var/lib/mysql"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ghost
-      MYSQL_USER: ghost
-      MYSQL_PASSWORD: &db_password ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: &db_password ${MYSQL_PASSWORD}
 
   ghost:
     image: ghost:5-alpine
@@ -28,7 +25,7 @@ services:
     environment:
       database__client: mysql
       database__connection__host: db
-      database__connection__user: ghost
+      database__connection__user: root
       database__connection__password: *db_password
       database__connection__database: ghost
       url: https://viasnake.com
