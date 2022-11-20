@@ -23,13 +23,22 @@ services:
       MYSQL_PASSWORD: &db_password ${DB_PASSWORD}
 
   panel:
-    image: ghcr.io/pterodactyl/development/panel:latest
+    image: ghcr.io/pterodactyl/panel:latest
     networks:
       - local
       - public
     volumes:
       - type: bind
-        source: "/mnt/shared/mcplaynetwork-panel/logs"
+        source: "/mnt/shared/mcplaynetwork-panel/var/"
+        target: "/app/var/"
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/nginx/"
+        target: "/etc/nginx/http.d/"
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/letsencrypt/"
+        target: "/etc/letsencrypt/"
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/logs/"
         target: "/app/storage/logs"
     environment:
       APP_KEY: ${APP_KEY}
