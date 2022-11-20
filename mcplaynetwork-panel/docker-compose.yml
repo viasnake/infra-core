@@ -23,7 +23,7 @@ services:
       MYSQL_PASSWORD: &db_password ${DB_PASSWORD}
 
   panel:
-    image: ghcr.io/mcplaynetwork/panel:develop
+    image: ghcr.io/pterodactyl/development/panel:latest
     networks:
       - local
       - public
