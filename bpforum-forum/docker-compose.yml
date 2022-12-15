@@ -17,7 +17,7 @@ services:
         target: "/var/lib/mysql"
 
   flarum:
-    image: ghcr.io/viasnake/flarum:stable
+    image: jeromegillard/flarum:latest
     networks:
       - public
       - local
