@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    networks:
+      - local
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+  proxy:
+    image: itzg/bungeecord
+    ports:
+      - published: 25565
+        target: 25577
+        protocol: tcp
+        mode: host
+    networks:
+      - local
+      - public
+    volumes:
+      - /mnt/shared/mcplaynetwork/proxy/plugins:/plugins
+      - /mnt/shared/mcplaynetwork/proxy/config:/config
+    environment:
+      TYPE: VELOCITY
+      MEMORY: 512m
+      REPLACE_ENV_VARIABLES: 'TRUE'
+      ENV_VARIABLE_PREFIX: 'CFG_'
+      CFG_BACKEND: ${BACKEND_IP}
+      CFG_DB_HOST: ${BACKEND_IP}
+      CFG_DB_PORT: '3306'
+      CFG_DB_NAME: ${DB_NAME}
+      CFG_DB_USER: ${DB_USER}
+      CFG_DB_PASSWORD_FILE: '/run/secrets/minecraft_db_password'
+    secrets:
+      - minecraft_db_password
+    restart: always
+    deploy:
+      mode: global
+
+networks:
+  local:
+    driver: overlay
+  public:
+    external: true
+
+secrets:
+  minecraft_db_password:
+    external: true
