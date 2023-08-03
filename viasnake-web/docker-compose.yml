@@ -31,7 +31,7 @@ services:
       url: https://viasnake.com
     deploy:
       labels:
-        caddy: viasnake.com www.viasnake.com
+        caddy: viasnake.com www.viasnake.com ghost.viasnake.com
         caddy.reverse_proxy: "{{upstreams 2368}}"
         caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
 
