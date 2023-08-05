@@ -28,10 +28,10 @@ services:
       database__connection__user: root
       database__connection__password: *db_password
       database__connection__database: ghost
-      url: https://viasnake.com
+      url: https://ghost.viasnake.com
     deploy:
       labels:
-        caddy: viasnake.com www.viasnake.com ghost.viasnake.com
+        caddy: ghost.viasnake.com
         caddy.reverse_proxy: "{{upstreams 2368}}"
         caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
 
