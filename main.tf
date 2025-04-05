@@ -6,7 +6,7 @@ module "disableServiceAccountKeyCreation_policy" {
   enforced   = false
 }
 
-module "admin_project" {
+module "admin_whole_project" {
   source = "./modules/project"
 
   name       = "jp1-admin-whole"
