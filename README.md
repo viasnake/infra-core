@@ -1,6 +1,6 @@
-# dns
+# terraform-googlecloud
 
-DNS に関する Terraform のコードを管理するリポジトリです。
+Google Cloud に関する Terraform のコードを管理するリポジトリです。
 
 ## ディレクトリ構成
 
