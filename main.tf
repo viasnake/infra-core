@@ -9,7 +9,7 @@ module "disableServiceAccountKeyCreation_policy" {
 module "admin_whole_project" {
   source = "./modules/project"
 
-  name       = "jp1-admin-whole"
-  project_id = "jp1-admin-whole"
+  name       = var.project_id
+  project_id = var.project_id
   org_id     = var.org_id
 }
