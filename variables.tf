@@ -3,5 +3,6 @@ variable "token" {
 }
 
 variable "email" {
-  type = string
+  type      = string
+  sensitive = true
 }
