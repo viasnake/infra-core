@@ -22,3 +22,12 @@ module "tunnel_route__prod-1" {
   network            = "10.210.0.0/16"
   virtual_network_id = module.tunnel_virtual_network__prod-1.id
 }
+
+module "storage-prod-1" {
+  source = "../../modules/tunnel"
+
+  account_id = var.cloudflare_account_id
+  name       = "storage-prod-1"
+  secret     = var.secret
+  config_src = "cloudflare"
+}
