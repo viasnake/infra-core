@@ -10,8 +10,9 @@ module "gateway-prod-1" {
 module "tunnel_virtual_network__prod-1" {
   source = "../../modules/tunnel_virtual_network"
 
-  account_id = var.cloudflare_account_id
-  name       = "prod-1"
+  account_id         = var.cloudflare_account_id
+  name               = "prod-1"
+  is_default_network = false
 }
 
 module "tunnel_route__prod-1" {
