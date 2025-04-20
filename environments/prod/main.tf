@@ -12,7 +12,7 @@ module "tunnel_virtual_network__prod-1" {
 
   account_id         = var.cloudflare_account_id
   name               = "prod-1"
-  is_default_network = false
+  is_default_network = true
 }
 
 module "tunnel_route__prod-1" {
