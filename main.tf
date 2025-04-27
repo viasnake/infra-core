@@ -37,7 +37,7 @@ module "oraclecloud_workspace" {
 }
 
 # Google Cloud
-module "jp1-admin-whole_workspace" {
+module "jp1_admin_whole_workspace" {
   source = "./modules/workspace"
 
   name                           = "jp1-admin-whole"
@@ -102,4 +102,9 @@ module "tfe_workspace" {
   auto_apply_run_trigger         = true
   vcs_repo_identifier            = "alflag-team/terraform-tfe"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+}
+
+moved {
+  from = module.jp1-admin-whole_workspace.tfe_workspace.main
+  to   = module.jp1_admin_whole_workspace.tfe_workspace.main
 }

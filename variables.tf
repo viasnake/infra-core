@@ -1,9 +1,11 @@
 variable "token" {
-  type      = string
-  sensitive = true
+  description = "Terraform Cloud token"
+  type        = string
+  sensitive   = true
 }
 
 variable "email" {
-  type      = string
-  sensitive = true
+  description = "Terraform Cloud email"
+  type        = string
+  sensitive   = true
 }
