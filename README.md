@@ -29,6 +29,7 @@
 | <a name="module_organization"></a> [organization](#module\_organization) | ./modules/organization | n/a |
 | <a name="module_tfe_project"></a> [tfe\_project](#module\_tfe\_project) | ./modules/project | n/a |
 | <a name="module_tfe_workspace"></a> [tfe\_workspace](#module\_tfe\_workspace) | ./modules/workspace | n/a |
+| <a name="module_unfettered_project"></a> [unfettered\_project](#module\_unfettered\_project) | ./modules/project | n/a |
 
 ## Resources
 
