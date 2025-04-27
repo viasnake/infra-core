@@ -42,21 +42,11 @@ variable "vcs_branch" {
 }
 
 variable "vcs_repo_identifier" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "vcs_github_app_installation_id" {
-  type = string
-  default = ""
-}
-
-variable "trigger_patterns" {
-  type = string
-  default = "*.tf"
-}
-
-variable "trigger_prefixes" {
-  type = string
+  type    = string
   default = ""
 }
