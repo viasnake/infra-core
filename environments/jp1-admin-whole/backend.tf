@@ -3,7 +3,7 @@ terraform {
     organization = "alflag"
 
     workspaces {
-      name = "googlecloud"
+      name = "jp1-admin-whole"
     }
   }
 
