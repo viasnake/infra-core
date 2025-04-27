@@ -23,6 +23,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [tfe_organization.main](https://registry.terraform.io/providers/hashicorp/tfe/0.64.0/docs/resources/organization) | resource |
+| [tfe_organization_default_settings.main](https://registry.terraform.io/providers/hashicorp/tfe/0.64.0/docs/resources/organization_default_settings) | resource |
 
 ## Inputs
 
