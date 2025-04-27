@@ -23,7 +23,7 @@
 | <a name="module_cloudflare_project"></a> [cloudflare\_project](#module\_cloudflare\_project) | ./modules/project | n/a |
 | <a name="module_cloudflare_tunnel_workspace"></a> [cloudflare\_tunnel\_workspace](#module\_cloudflare\_tunnel\_workspace) | ./modules/workspace | n/a |
 | <a name="module_dns_workspace"></a> [dns\_workspace](#module\_dns\_workspace) | ./modules/workspace | n/a |
-| <a name="module_googlecloud_workspace"></a> [googlecloud\_workspace](#module\_googlecloud\_workspace) | ./modules/workspace | n/a |
+| <a name="module_jp1-admin-whole_workspace"></a> [jp1-admin-whole\_workspace](#module\_jp1-admin-whole\_workspace) | ./modules/workspace | n/a |
 | <a name="module_oraclecloud_workspace"></a> [oraclecloud\_workspace](#module\_oraclecloud\_workspace) | ./modules/workspace | n/a |
 | <a name="module_organization"></a> [organization](#module\_organization) | ./modules/organization | n/a |
 | <a name="module_publiccloud_project"></a> [publiccloud\_project](#module\_publiccloud\_project) | ./modules/project | n/a |

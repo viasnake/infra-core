@@ -16,13 +16,6 @@ module "alflag_project" {
   organization = module.organization.name
 }
 
-module "cloudflare_project" {
-  source = "./modules/project"
-
-  name         = "cloudflare"
-  organization = module.organization.name
-}
-
 module "publiccloud_project" {
   source = "./modules/project"
 
@@ -30,6 +23,7 @@ module "publiccloud_project" {
   organization = module.organization.name
 }
 
+# Oracle Cloud
 module "oraclecloud_workspace" {
   source = "./modules/workspace"
 
@@ -42,15 +36,25 @@ module "oraclecloud_workspace" {
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
 }
 
-module "googlecloud_workspace" {
+# Google Cloud
+module "jp1-admin-whole_workspace" {
   source = "./modules/workspace"
 
-  name                           = "googlecloud"
+  name                           = "jp1-admin-whole"
   organization                   = module.organization.name
   auto_apply                     = true
   auto_apply_run_trigger         = true
+  working_directory              = "environments/jp1-admin-whole"
   vcs_repo_identifier            = "alflag-team/terraform-googlecloud"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+}
+
+# Cloudflare
+module "cloudflare_project" {
+  source = "./modules/project"
+
+  name         = "cloudflare"
+  organization = module.organization.name
 }
 
 module "cloudflare_access_workspace" {
@@ -88,6 +92,7 @@ module "dns_workspace" {
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
 }
 
+# Terraform Cloud
 module "tfe_workspace" {
   source = "./modules/workspace"
 
@@ -97,4 +102,9 @@ module "tfe_workspace" {
   auto_apply_run_trigger         = true
   vcs_repo_identifier            = "alflag-team/terraform-tfe"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+}
+
+moved {
+  from = module.googlecloud_workspace.tfe_workspace.main
+  to   = module.jp1-admin-whole_workspace.tfe_workspace.main
 }
