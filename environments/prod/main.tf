@@ -3,14 +3,14 @@ data "tfe_github_app_installation" "main" {
 }
 
 module "organization" {
-  source = "./modules/organization"
+  source = "../../modules/organization"
 
   name  = "alflag"
   email = var.email
 }
 
 module "unfettered_project" {
-  source = "./modules/project"
+  source = "../../modules/project"
 
   name         = "unfettered"
   organization = module.organization.name
@@ -18,14 +18,14 @@ module "unfettered_project" {
 
 # Oracle Cloud
 module "oraclecloud_project" {
-  source = "./modules/project"
+  source = "../../modules/project"
 
   name         = "oraclecloud"
   organization = module.organization.name
 }
 
 module "oraclecloud_workspace" {
-  source = "./modules/workspace"
+  source = "../../modules/workspace"
 
   name                           = "oraclecloud"
   organization                   = module.organization.name
@@ -39,14 +39,14 @@ module "oraclecloud_workspace" {
 
 ## Google Cloud
 module "googlecloud_project" {
-  source = "./modules/project"
+  source = "../../modules/project"
 
   name         = "googlecloud"
   organization = module.organization.name
 }
 
 module "jp1_admin_whole_workspace" {
-  source = "./modules/workspace"
+  source = "../../modules/workspace"
 
   name                           = "jp1-admin-whole"
   organization                   = module.organization.name
@@ -60,14 +60,14 @@ module "jp1_admin_whole_workspace" {
 
 # Cloudflare
 module "cloudflare_project" {
-  source = "./modules/project"
+  source = "../../modules/project"
 
   name         = "cloudflare"
   organization = module.organization.name
 }
 
 module "cloudflare_access_workspace" {
-  source = "./modules/workspace"
+  source = "../../modules/workspace"
 
   name                           = "cloudflare-access"
   organization                   = module.organization.name
@@ -80,7 +80,7 @@ module "cloudflare_access_workspace" {
 }
 
 module "cloudflare_tunnel_workspace" {
-  source = "./modules/workspace"
+  source = "../../modules/workspace"
 
   name                           = "cloudflare-tunnel"
   organization                   = module.organization.name
@@ -93,7 +93,7 @@ module "cloudflare_tunnel_workspace" {
 }
 
 module "dns_workspace" {
-  source = "./modules/workspace"
+  source = "../../modules/workspace"
 
   name                           = "dns"
   organization                   = module.organization.name
@@ -106,19 +106,20 @@ module "dns_workspace" {
 
 # Terraform Cloud
 module "tfe_project" {
-  source = "./modules/project"
+  source = "../../modules/project"
 
   name         = "tfe"
   organization = module.organization.name
 }
 
 module "tfe_workspace" {
-  source = "./modules/workspace"
+  source = "../../modules/workspace"
 
   name                           = "tfe"
   organization                   = module.organization.name
   auto_apply                     = true
   auto_apply_run_trigger         = true
+  working_directory              = "environments/prod"
   vcs_repo_identifier            = "alflag-team/terraform-tfe"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
   project_id                     = module.tfe_project.id
