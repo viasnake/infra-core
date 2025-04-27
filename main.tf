@@ -103,8 +103,3 @@ module "tfe_workspace" {
   vcs_repo_identifier            = "alflag-team/terraform-tfe"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
 }
-
-moved {
-  from = module.jp1-admin-whole_workspace.tfe_workspace.main
-  to   = module.jp1_admin_whole_workspace.tfe_workspace.main
-}
