@@ -7,6 +7,7 @@ resource "tfe_workspace" "main" {
   auto_apply_run_trigger = var.auto_apply_run_trigger
   queue_all_runs         = var.queue_all_runs
   working_directory      = var.working_directory
+  project_id             = var.project_id
 
   vcs_repo {
     branch                     = var.vcs_branch

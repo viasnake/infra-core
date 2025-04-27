@@ -18,15 +18,15 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alflag_project"></a> [alflag\_project](#module\_alflag\_project) | ./modules/project | n/a |
 | <a name="module_cloudflare_access_workspace"></a> [cloudflare\_access\_workspace](#module\_cloudflare\_access\_workspace) | ./modules/workspace | n/a |
 | <a name="module_cloudflare_project"></a> [cloudflare\_project](#module\_cloudflare\_project) | ./modules/project | n/a |
 | <a name="module_cloudflare_tunnel_workspace"></a> [cloudflare\_tunnel\_workspace](#module\_cloudflare\_tunnel\_workspace) | ./modules/workspace | n/a |
 | <a name="module_dns_workspace"></a> [dns\_workspace](#module\_dns\_workspace) | ./modules/workspace | n/a |
+| <a name="module_googlecloud_project"></a> [googlecloud\_project](#module\_googlecloud\_project) | ./modules/project | n/a |
 | <a name="module_jp1_admin_whole_workspace"></a> [jp1\_admin\_whole\_workspace](#module\_jp1\_admin\_whole\_workspace) | ./modules/workspace | n/a |
+| <a name="module_oraclecloud_project"></a> [oraclecloud\_project](#module\_oraclecloud\_project) | ./modules/project | n/a |
 | <a name="module_oraclecloud_workspace"></a> [oraclecloud\_workspace](#module\_oraclecloud\_workspace) | ./modules/workspace | n/a |
 | <a name="module_organization"></a> [organization](#module\_organization) | ./modules/organization | n/a |
-| <a name="module_publiccloud_project"></a> [publiccloud\_project](#module\_publiccloud\_project) | ./modules/project | n/a |
 | <a name="module_tfe_workspace"></a> [tfe\_workspace](#module\_tfe\_workspace) | ./modules/workspace | n/a |
 
 ## Resources

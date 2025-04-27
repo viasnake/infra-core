@@ -50,3 +50,8 @@ variable "vcs_github_app_installation_id" {
   type    = string
   default = ""
 }
+
+variable "project_id" {
+  type    = string
+  default = ""
+}

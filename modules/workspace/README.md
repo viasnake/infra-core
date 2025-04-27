@@ -33,6 +33,7 @@ No modules.
 | <a name="input_force_delete"></a> [force\_delete](#input\_force\_delete) | n/a | `bool` | `false` | no |
 | <a name="input_name"></a> [name](#input\_name) | n/a | `string` | n/a | yes |
 | <a name="input_organization"></a> [organization](#input\_organization) | n/a | `string` | n/a | yes |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | `""` | no |
 | <a name="input_queue_all_runs"></a> [queue\_all\_runs](#input\_queue\_all\_runs) | n/a | `bool` | `true` | no |
 | <a name="input_tag_names"></a> [tag\_names](#input\_tag\_names) | n/a | `list(string)` | `[]` | no |
 | <a name="input_vcs_branch"></a> [vcs\_branch](#input\_vcs\_branch) | n/a | `string` | `""` | no |

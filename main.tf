@@ -9,21 +9,14 @@ module "organization" {
   email = var.email
 }
 
-module "alflag_project" {
-  source = "./modules/project"
-
-  name         = "alflag"
-  organization = module.organization.name
-}
-
-module "publiccloud_project" {
-  source = "./modules/project"
-
-  name         = "publiccloud"
-  organization = module.organization.name
-}
-
 # Oracle Cloud
+module "oraclecloud_project" {
+  source = "./modules/project"
+
+  name         = "oraclecloud"
+  organization = module.organization.name
+}
+
 module "oraclecloud_workspace" {
   source = "./modules/workspace"
 
@@ -34,9 +27,17 @@ module "oraclecloud_workspace" {
   working_directory              = "environments/prod"
   vcs_repo_identifier            = "alflag-team/terraform-oraclecloud"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+  project_id                     = module.oraclecloud_project.id
 }
 
-# Google Cloud
+## Google Cloud
+module "googlecloud_project" {
+  source = "./modules/project"
+
+  name         = "googlecloud"
+  organization = module.organization.name
+}
+
 module "jp1_admin_whole_workspace" {
   source = "./modules/workspace"
 
@@ -47,6 +48,7 @@ module "jp1_admin_whole_workspace" {
   working_directory              = "environments/jp1-admin-whole"
   vcs_repo_identifier            = "alflag-team/terraform-googlecloud"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+  project_id                     = module.googlecloud_project.id
 }
 
 # Cloudflare
@@ -67,6 +69,7 @@ module "cloudflare_access_workspace" {
   working_directory              = "environments/prod"
   vcs_repo_identifier            = "alflag-team/terraform-cloudflare-access"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+  project_id                     = module.cloudflare_project.id
 }
 
 module "cloudflare_tunnel_workspace" {
@@ -79,6 +82,7 @@ module "cloudflare_tunnel_workspace" {
   working_directory              = "environments/prod"
   vcs_repo_identifier            = "alflag-team/terraform-cloudflare-tunnel"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+  project_id                     = module.cloudflare_project.id
 }
 
 module "dns_workspace" {
@@ -90,6 +94,7 @@ module "dns_workspace" {
   auto_apply_run_trigger         = true
   vcs_repo_identifier            = "alflag-team/terraform-dns"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+  project_id                     = module.cloudflare_project.id
 }
 
 # Terraform Cloud
