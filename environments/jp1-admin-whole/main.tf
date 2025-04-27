@@ -1,5 +1,5 @@
 module "disableServiceAccountKeyCreation_policy" {
-  source = "./modules/organization_policy_boolean"
+  source = "../../modules/organization_policy_boolean"
 
   org_id     = var.org_id
   constraint = "constraints/iam.disableServiceAccountKeyCreation"
@@ -7,7 +7,7 @@ module "disableServiceAccountKeyCreation_policy" {
 }
 
 module "admin_whole_project" {
-  source = "./modules/project"
+  source = "../../modules/project"
 
   name       = var.project_id
   project_id = var.project_id
