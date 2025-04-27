@@ -98,6 +98,13 @@ module "dns_workspace" {
 }
 
 # Terraform Cloud
+module "tfe_project" {
+  source = "./modules/project"
+
+  name         = "tfe"
+  organization = module.organization.name
+}
+
 module "tfe_workspace" {
   source = "./modules/workspace"
 
@@ -107,4 +114,5 @@ module "tfe_workspace" {
   auto_apply_run_trigger         = true
   vcs_repo_identifier            = "alflag-team/terraform-tfe"
   vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+  project_id                     = module.tfe_project.id
 }

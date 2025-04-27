@@ -27,6 +27,7 @@
 | <a name="module_oraclecloud_project"></a> [oraclecloud\_project](#module\_oraclecloud\_project) | ./modules/project | n/a |
 | <a name="module_oraclecloud_workspace"></a> [oraclecloud\_workspace](#module\_oraclecloud\_workspace) | ./modules/workspace | n/a |
 | <a name="module_organization"></a> [organization](#module\_organization) | ./modules/organization | n/a |
+| <a name="module_tfe_project"></a> [tfe\_project](#module\_tfe\_project) | ./modules/project | n/a |
 | <a name="module_tfe_workspace"></a> [tfe\_workspace](#module\_tfe\_workspace) | ./modules/workspace | n/a |
 
 ## Resources
