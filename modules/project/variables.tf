@@ -9,3 +9,8 @@ variable "project_id" {
 variable "org_id" {
   type = string
 }
+
+variable "auto_create_network" {
+  type    = bool
+  default = false
+}
