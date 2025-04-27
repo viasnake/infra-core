@@ -16,11 +16,6 @@ module "unfettered_project" {
   organization = module.organization.name
 }
 
-import {
-  id = "prj-Bo8AaFToF5ag6jVN"
-  to = module.unfettered_project.tfe_project.main
-}
-
 # Oracle Cloud
 module "oraclecloud_project" {
   source = "./modules/project"
