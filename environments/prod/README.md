@@ -21,6 +21,7 @@
 | <a name="module_cloudflare_access_workspace"></a> [cloudflare\_access\_workspace](#module\_cloudflare\_access\_workspace) | ../../modules/workspace | n/a |
 | <a name="module_cloudflare_project"></a> [cloudflare\_project](#module\_cloudflare\_project) | ../../modules/project | n/a |
 | <a name="module_cloudflare_tunnel_workspace"></a> [cloudflare\_tunnel\_workspace](#module\_cloudflare\_tunnel\_workspace) | ../../modules/workspace | n/a |
+| <a name="module_cloudflare_workspace"></a> [cloudflare\_workspace](#module\_cloudflare\_workspace) | ../../modules/workspace | n/a |
 | <a name="module_dns_workspace"></a> [dns\_workspace](#module\_dns\_workspace) | ../../modules/workspace | n/a |
 | <a name="module_googlecloud_project"></a> [googlecloud\_project](#module\_googlecloud\_project) | ../../modules/project | n/a |
 | <a name="module_jp1_admin_whole_workspace"></a> [jp1\_admin\_whole\_workspace](#module\_jp1\_admin\_whole\_workspace) | ../../modules/workspace | n/a |

@@ -66,6 +66,19 @@ module "cloudflare_project" {
   organization = module.organization.name
 }
 
+module "cloudflare_workspace" {
+  source = "../../modules/workspace"
+
+  name                           = "cloudflare"
+  organization                   = module.organization.name
+  auto_apply                     = true
+  auto_apply_run_trigger         = true
+  working_directory              = "environments/prod"
+  vcs_repo_identifier            = "alflag-team/terraform-cloudflare"
+  vcs_github_app_installation_id = data.tfe_github_app_installation.main.id
+  project_id                     = module.cloudflare_project.id
+}
+
 module "cloudflare_access_workspace" {
   source = "../../modules/workspace"
 
