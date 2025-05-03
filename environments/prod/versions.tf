@@ -5,16 +5,5 @@ terraform {
       version = "~> 4.0"
     }
   }
-
-  cloud {
-    organization = "alflag"
-
-    workspaces {
-      name = "cloudflare-tunnel"
-    }
-  }
-
-  # backend "local" {
-  #   path = "local.tfstate"
-  # }
+  required_version = ">= 1.11.0"
 }
