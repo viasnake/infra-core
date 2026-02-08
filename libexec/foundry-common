@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+foundry_output_format() {
+  local fmt="${FOUNDRY_OUTPUT:-human}"
+  case "$fmt" in
+  human | json | yaml)
+    printf '%s\n' "$fmt"
+    ;;
+  *)
+    printf '%s\n' "human"
+    ;;
+  esac
+}
+
+foundry_emit_json() {
+  local payload="$1"
+  local fmt
+  fmt="$(foundry_output_format)"
+
+  case "$fmt" in
+  human)
+    printf '%s\n' "$payload"
+    ;;
+  json)
+    printf '%s\n' "$payload"
+    ;;
+  yaml)
+    python3 - "$payload" <<'PY'
+import json
+import sys
+
+def dump_yaml(value, indent=0):
+    prefix = " " * indent
+    if isinstance(value, dict):
+        for k, v in value.items():
+            if isinstance(v, (dict, list)):
+                print(f"{prefix}{k}:")
+                dump_yaml(v, indent + 2)
+            else:
+                print(f"{prefix}{k}: {scalar(v)}")
+    elif isinstance(value, list):
+        for item in value:
+            if isinstance(item, (dict, list)):
+                print(f"{prefix}-")
+                dump_yaml(item, indent + 2)
+            else:
+                print(f"{prefix}- {scalar(item)}")
+
+def scalar(v):
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if v is None:
+        return "null"
+    if isinstance(v, (int, float)):
+        return str(v)
+    s = str(v)
+    if s == "" or any(ch in s for ch in [":", "#", "{", "}", "[", "]", "\n", "'", '"']):
+        return json.dumps(s)
+    return s
+
+data = json.loads(sys.argv[1])
+dump_yaml(data)
+PY
+    ;;
+  esac
+}
+
+foundry_fail() {
+  local code="$1"
+  local retryable="$2"
+  local message="$3"
+  local fmt
+  fmt="$(foundry_output_format)"
+
+  if [ "$fmt" = "human" ]; then
+    printf 'ERROR: %s (retryable=%s)\n' "$message" "$retryable" >&2
+  else
+    foundry_emit_json "{\"error\":\"${message}\",\"retryable\":${retryable},\"exit_code\":${code}}"
+  fi
+
+  exit "$code"
+}
+
+foundry_require_arg() {
+  local value="$1"
+  local message="$2"
+  if [ -z "$value" ]; then
+    foundry_fail 2 false "$message"
+  fi
+}
+
+foundry_run() {
+  if [ "${FOUNDRY_TRACE:-0}" = "1" ]; then
+    printf 'RUN: %s\n' "$*" >&2
+  fi
+  "$@"
+}
