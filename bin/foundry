@@ -7,7 +7,8 @@ ROOT_DIR="$(cd "${SELF_DIR}/.." && pwd)"
 LIBEXEC_DIR="${ROOT_DIR}/libexec"
 
 if [ "$#" -eq 0 ]; then
-  exec "${LIBEXEC_DIR}/foundry-help"
+  "${LIBEXEC_DIR}/foundry-help"
+  exit 2
 fi
 
 OUTPUT_FORMAT="human"
@@ -34,7 +35,8 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ "${#ARGS[@]}" -eq 0 ]; then
-  exec "${LIBEXEC_DIR}/foundry-help"
+  "${LIBEXEC_DIR}/foundry-help"
+  exit 2
 fi
 
 CMD="${ARGS[0]}"
@@ -43,7 +45,8 @@ TARGET="${LIBEXEC_DIR}/foundry-${CMD}"
 
 if [ ! -x "${TARGET}" ]; then
   echo "unknown command: ${CMD}" >&2
-  exec "${LIBEXEC_DIR}/foundry-help"
+  "${LIBEXEC_DIR}/foundry-help"
+  exit 2
 fi
 
 export FOUNDRY_OUTPUT="${OUTPUT_FORMAT}"
