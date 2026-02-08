@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if command -v foundry >/dev/null 2>&1; then
+  exec foundry "$@"
+fi
+
+echo "foundry CLI is required but not installed." >&2
+echo "Install: https://github.com/alflag-team/foundry" >&2
+echo "Then run: foundry --root \"$(pwd)\" --overlay \"/path/to/private/overlay\" doctor" >&2
+exit 127

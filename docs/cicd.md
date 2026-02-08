@@ -1,17 +1,17 @@
-# Foundry CI/CD
+# foundry-core CI/CD
 
-Foundry CI/CD is built around small, composable checks and reproducible toolchains.
+foundry-core CI/CD validates public boundary hygiene and document integrity.
 
 ## Workflows
 
 - `ci` (`.github/workflows/ci.yml`)
-  - `lint-shell`: shell lint for Foundry scripts via `shellcheck`
-  - `contract-check`: contract file existence and `version` JSON contract validation
-  - `smoke`: phase 0/1 smoke checks and expected `doctor` failure without runtime tunnel secret
+  - `lint-shell`: shell lint for wrapper and guard scripts via `shellcheck`
+  - `contract-link-check`: contract docs exist and point to `alflag-team/foundry`
+  - `sensitive-check`: scans public boundary files for secret-like patterns and disallowed IPv4 literals
 
 - `release` (`.github/workflows/release.yml`)
   - Trigger: tag push `v*`
-  - Builds release tarball from Foundry runtime assets
+  - Builds release tarball from foundry-core assets
   - Publishes GitHub release with generated notes
 
 ## Local Parity
@@ -20,8 +20,8 @@ Use `mise` locally before pushing:
 
 ```bash
 mise install
-mise exec -- shellcheck bin/foundry libexec/foundry-* tools/scripts/foundry-smoke.sh
-mise exec -- tools/scripts/foundry-smoke.sh
+mise exec -- shellcheck bin/foundry scripts/check-sensitive.sh
+scripts/check-sensitive.sh
 ```
 
 ## Branch Protection Recommendation
@@ -29,5 +29,5 @@ mise exec -- tools/scripts/foundry-smoke.sh
 Set these required checks on `master`:
 
 - `lint-shell`
-- `contract-check`
-- `smoke`
+- `contract-link-check`
+- `sensitive-check`

@@ -1,0 +1,5 @@
+HOST_NAME=example-admin
+HOST_ADDRESS=203.0.113.10
+HOST_USER=infra
+HOST_PROVIDER=example
+HOST_TAGS=bastion,foundry

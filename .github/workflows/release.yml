@@ -25,18 +25,18 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          ARCHIVE="foundry-${TAG}-linux-amd64.tar.gz"
+          ARCHIVE="foundry-core-${TAG}.tar.gz"
           tar -czf "$ARCHIVE" \
-            bin \
-            libexec \
-            docs \
             README.md \
-            mise.toml \
-            inventory \
-            packer \
-            terraform \
+            docs \
             ansible \
-            cloud-init
+            terraform \
+            packer \
+            cloud-init \
+            providers \
+            overlay.example \
+            scripts \
+            bin
           echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
 
       - name: Publish GitHub release
