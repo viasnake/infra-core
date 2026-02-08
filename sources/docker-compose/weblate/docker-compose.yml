@@ -1,0 +1,55 @@
+version: "3"
+services:
+
+  weblate:
+    image: weblate/weblate
+    container_name: weblate
+    ports:
+      - 49610:8080
+    restart: always
+    tmpfs:
+      - /app/cache
+    volumes:
+      - weblate-data:/app/data
+    environment:
+      WEBLATE_EMAIL_HOST: ${WEBLATE_EMAIL_HOST}
+      WEBLATE_EMAIL_PORT: ${WEBLATE_EMAIL_PORT}
+      WEBLATE_EMAIL_USE_SSL: ${WEBLATE_EMAIL_USE_SSL}
+      WEBLATE_EMAIL_USE_TLS: ${WEBLATE_EMAIL_USE_TLS}
+      WEBLATE_EMAIL_HOST_USER: ${WEBLATE_EMAIL_HOST_USER}
+      WEBLATE_EMAIL_HOST_PASSWORD: ${WEBLATE_EMAIL_HOST_PASSWORD}
+      WEBLATE_SERVER_EMAIL: ${WEBLATE_SERVER_EMAIL}
+      WEBLATE_DEFAULT_FROM_EMAIL: ${WEBLATE_DEFAULT_FROM_EMAIL}
+      WEBLATE_SITE_DOMAIN: ${WEBLATE_SITE_DOMAIN}
+      WEBLATE_ADMIN_PASSWORD: ${WEBLATE_ADMIN_PASSWORD}
+      WEBLATE_ADMIN_NAME: ${WEBLATE_ADMIN_NAME}
+      WEBLATE_ADMIN_EMAIL: ${WEBLATE_ADMIN_EMAIL}
+      WEBLATE_GITHUB_USERNAME: ${WEBLATE_GITHUB_USERNAME}
+      WEBLATE_GITHUB_TOKEN: ${WEBLATE_GITHUB_TOKEN}
+      WEBLATE_AUTO_UPDATE: ${WEBLATE_AUTO_UPDATE}
+      WEBLATE_SITE_TITLE: ${WEBLATE_SITE_TITLE}
+      WEBLATE_DEFAULT_COMMITER_NAME: ${WEBLATE_DEFAULT_COMMITER_NAME}
+      WEBLATE_DEFAULT_COMMITER_EMAIL: ${WEBLATE_DEFAULT_COMMITER_EMAIL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  postgresql:
+    image: postgres:13-alpine
+    container_name: weblate_db
+    restart: always
+    volumes:
+      - weblate-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+volumes:
+  weblate-data:
+    external: true
+  weblate-db-data:
+    external: true
