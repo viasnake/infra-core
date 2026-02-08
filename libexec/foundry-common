@@ -24,7 +24,11 @@ foundry_emit_json() {
     printf '%s\n' "$payload"
     ;;
   json)
-    printf '%s\n' "$payload"
+    if command -v jq >/dev/null 2>&1; then
+      printf '%s\n' "$payload" | jq .
+    else
+      printf '%s\n' "$payload"
+    fi
     ;;
   yaml)
     python3 - "$payload" <<'PY'
@@ -67,6 +71,20 @@ PY
   esac
 }
 
+foundry_emit_object() {
+  local json_payload="$1"
+  local human_renderer="$2"
+  local fmt
+  fmt="$(foundry_output_format)"
+
+  if [ "$fmt" = "human" ]; then
+    "$human_renderer" "$json_payload"
+    return 0
+  fi
+
+  foundry_emit_json "$json_payload"
+}
+
 foundry_fail() {
   local code="$1"
   local retryable="$2"
@@ -81,6 +99,47 @@ foundry_fail() {
   fi
 
   exit "$code"
+}
+
+foundry_bool_json() {
+  local value="$1"
+  if [ "$value" = "true" ] || [ "$value" = "1" ] || [ "$value" = "yes" ]; then
+    printf 'true\n'
+    return 0
+  fi
+  printf 'false\n'
+}
+
+foundry_json_string() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+print(json.dumps(sys.argv[1]))
+PY
+}
+
+foundry_has_command() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+foundry_command_version() {
+  local cmd="$1"
+  local fallback="$2"
+  if ! foundry_has_command "$cmd"; then
+    printf 'not-found\n'
+    return 0
+  fi
+
+  local output
+  output="$($cmd --version 2>/dev/null | head -n 1 || true)"
+  if [ -z "$output" ] && [ -n "$fallback" ]; then
+    output="$($cmd "$fallback" 2>/dev/null | head -n 1 || true)"
+  fi
+  if [ -z "$output" ]; then
+    output="available"
+  fi
+  printf '%s\n' "$output"
 }
 
 foundry_require_arg() {
