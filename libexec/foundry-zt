@@ -8,6 +8,10 @@ ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SECRETS_FILE="${ROOT}/secrets/cloudlared.env"
 COMPOSE_FILE="${ROOT}/tools/docker/cloudflared/compose.yaml"
 
+if [ ! -f "${SECRETS_FILE}" ] && [ -f "${ROOT}/secrets/cloudflared.env" ]; then
+  SECRETS_FILE="${ROOT}/secrets/cloudflared.env"
+fi
+
 zt_snapshot_json() {
   local has_cloudflared="false"
   local has_compose="false"

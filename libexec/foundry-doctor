@@ -42,8 +42,11 @@ file_present_check() {
 
 cloudflare_token_check() {
   local env_file="${SECRETS_DIR}/cloudlared.env"
+  if [ ! -f "$env_file" ] && [ -f "${SECRETS_DIR}/cloudflared.env" ]; then
+    env_file="${SECRETS_DIR}/cloudflared.env"
+  fi
   if [ ! -f "$env_file" ]; then
-    add_check "cloudflare:tunnel-token" "false" "true" "${env_file} is missing"
+    add_check "cloudflare:tunnel-token" "false" "true" "${SECRETS_DIR}/cloudlared.env is missing"
     return
   fi
 
