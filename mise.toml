@@ -1,0 +1,7 @@
+[tools]
+python = "3.12"
+jq = "1.8.1"
+terraform = "1.14.4"
+ansible = "latest"
+packer = "latest"
+cloudflared = "latest"
