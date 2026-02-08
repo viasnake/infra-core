@@ -65,7 +65,6 @@ tool_check "ansible-playbook" "false"
 tool_check "packer" "false"
 tool_check "cloudflared" "false"
 
-file_present_check "config:cloudflared-compose" "true" "${ROOT}/tools/docker/cloudflared/compose.yaml"
 file_present_check "config:hosts-inventory" "false" "${ROOT}/inventory/hosts"
 cloudflare_token_check
 

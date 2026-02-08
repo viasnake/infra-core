@@ -6,7 +6,6 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
 ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SECRETS_FILE="${ROOT}/secrets/cloudlared.env"
-COMPOSE_FILE="${ROOT}/tools/docker/cloudflared/compose.yaml"
 
 if [ ! -f "${SECRETS_FILE}" ] && [ -f "${ROOT}/secrets/cloudflared.env" ]; then
   SECRETS_FILE="${ROOT}/secrets/cloudflared.env"
@@ -14,15 +13,10 @@ fi
 
 zt_snapshot_json() {
   local has_cloudflared="false"
-  local has_compose="false"
   local has_token="false"
 
   if foundry_has_command cloudflared; then
     has_cloudflared="true"
-  fi
-
-  if [ -f "${COMPOSE_FILE}" ]; then
-    has_compose="true"
   fi
 
   if [ -f "${SECRETS_FILE}" ] && grep -q '^TUNNEL_TOKEN=.' "${SECRETS_FILE}"; then
@@ -30,14 +24,13 @@ zt_snapshot_json() {
   fi
 
   local ready="false"
-  if [ "${has_compose}" = "true" ] && [ "${has_token}" = "true" ]; then
+  if [ "${has_token}" = "true" ]; then
     ready="true"
   fi
 
-  printf '{"command":"zt","control_plane":"cloudflare-zero-trust","ready":%s,"retryable":true,"checks":{"cloudflared_binary":%s,"compose_file":%s,"tunnel_token":%s}}\n' \
+  printf '{"command":"zt","control_plane":"cloudflare-zero-trust","ready":%s,"retryable":true,"checks":{"cloudflared_binary":%s,"tunnel_token":%s}}\n' \
     "$(foundry_bool_json "${ready}")" \
     "$(foundry_bool_json "${has_cloudflared}")" \
-    "$(foundry_bool_json "${has_compose}")" \
     "$(foundry_bool_json "${has_token}")"
 }
 
