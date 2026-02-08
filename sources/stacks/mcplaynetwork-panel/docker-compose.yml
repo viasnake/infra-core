@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  cache:
+    image: redis:alpine
+    networks:
+     - local
+
+  db:
+    image: mariadb:10.5
+    command:
+      - --default-authentication-plugin=mysql_native_password
+    networks:
+      - local
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/db"
+        target: "/var/lib/mysql"
+    environment:
+      MYSQL_DATABASE: panel
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: pterodactyl
+      MYSQL_PASSWORD: &db_password ${DB_PASSWORD}
+
+  panel:
+    image: ghcr.io/pterodactyl/panel:latest
+    networks:
+      - local
+      - public
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/var/"
+        target: "/app/var/"
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/nginx/"
+        target: "/etc/nginx/http.d/"
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/letsencrypt/"
+        target: "/etc/letsencrypt/"
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-panel/logs/"
+        target: "/app/storage/logs"
+    environment:
+      APP_KEY: ${APP_KEY}
+      APP_SERVICE_AUTHOR: support@mcplay.biz
+      APP_TIMEZONE: Asia/Tokyo
+      APP_URL: https://panel.mcplay.biz
+      MAIL_DRIVER: smtp
+      MAIL_ENCRYPTION: 'true'
+      MAIL_FROM: support@mcplay.biz
+      MAIL_HOST: smtp.google.com
+      MAIL_PORT: '25'
+      APP_ENV: production
+      APP_ENVIRONMENT_ONLY: 'false'
+      DB_HOST: db
+      DB_PASSWORD: *db_password
+      DB_PORT: '3306'
+      CACHE_DRIVER: redis
+      QUEUE_DRIVER: redis
+      REDIS_HOST: cache
+      SESSION_DRIVER: redis
+    deploy:
+      labels:
+        caddy: panel.mcplay.biz
+        caddy.reverse_proxy: '{{upstreams}}'
+        caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
+
+networks:
+  local:
+    driver: overlay
+  public:
+    external: true

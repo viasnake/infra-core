@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+
+  haproxy:
+    image: haproxy:lts
+    ports:
+      - published: 25565
+        target: 25565
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-proxy/haproxy.cfg"
+        target: "/usr/local/etc/haproxy/haproxy.cfg"
+    deploy:
+      mode: global
