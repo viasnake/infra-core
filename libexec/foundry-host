@@ -6,6 +6,7 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
 ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 INVENTORY_DIR="${ROOT}/inventory/hosts"
+PROVIDER_REGISTRY="${ROOT}/providers/registry.txt"
 
 list_hosts_json() {
   python3 - "$INVENTORY_DIR" <<'PY'
@@ -133,25 +134,63 @@ print("- tags: {}".format(",".join(data.get("tags", [])) or "-"))
 PY
 }
 
-if [ ! -d "$INVENTORY_DIR" ]; then
-  foundry_fail 1 true "inventory directory not found: ${INVENTORY_DIR}"
-fi
+providers_json() {
+  python3 - "$PROVIDER_REGISTRY" <<'PY'
+import json
+import sys
+
+providers = []
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    for raw in f:
+        item = raw.strip()
+        if not item or item.startswith("#"):
+            continue
+        providers.append(item)
+
+print(json.dumps({"command": "host providers", "providers": providers}, separators=(",", ":")))
+PY
+}
+
+providers_human() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+data = json.loads(sys.argv[1])
+print("Foundry provider targets")
+for provider in data.get("providers", []):
+    print("- {}".format(provider))
+PY
+}
 
 subcommand="${1:-}"
 shift || true
 
 case "$subcommand" in
 list)
+  if [ ! -d "$INVENTORY_DIR" ]; then
+    foundry_fail 1 true "inventory directory not found: ${INVENTORY_DIR}"
+  fi
   payload="$(list_hosts_json)"
   foundry_emit_object "$payload" host_list_human
   ;;
 inspect)
+  if [ ! -d "$INVENTORY_DIR" ]; then
+    foundry_fail 1 true "inventory directory not found: ${INVENTORY_DIR}"
+  fi
   host="${1:-}"
   foundry_require_arg "$host" "usage: foundry host inspect <host>"
   payload="$(host_inspect_json "$host")"
   foundry_emit_object "$payload" host_inspect_human
   ;;
+providers)
+  if [ ! -f "$PROVIDER_REGISTRY" ]; then
+    foundry_fail 1 false "provider registry not found: ${PROVIDER_REGISTRY}"
+  fi
+  payload="$(providers_json)"
+  foundry_emit_object "$payload" providers_human
+  ;;
 *)
-  foundry_fail 2 false "usage: foundry host <list|inspect>"
+  foundry_fail 2 false "usage: foundry host <list|inspect|providers>"
   ;;
 esac

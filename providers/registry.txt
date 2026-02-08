@@ -1,0 +1,7 @@
+proxmox
+oci
+sakura
+linode
+vultr
+aws
+gcp
