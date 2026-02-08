@@ -1,0 +1,7 @@
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+# --- BEGIN PVE ---
+10.210.2.240 dns100.srv.alflag.internal dns100
+# --- END PVE ---
