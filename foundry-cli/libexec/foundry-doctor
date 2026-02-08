@@ -4,8 +4,10 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-SECRETS_DIR="${ROOT}/secrets"
+ROOT="$(foundry_root)"
+OVERLAY="$(foundry_overlay_root)"
+SECRETS_DIR="$(foundry_path_join "${OVERLAY}" "secrets")"
+INVENTORY_PATH="$(foundry_path_join "${OVERLAY}" "inventory/hosts")"
 
 tmp_checks="$(mktemp)"
 trap 'rm -f "${tmp_checks}"' EXIT
@@ -41,6 +43,12 @@ file_present_check() {
 }
 
 cloudflare_token_check() {
+  if [ -z "${SECRETS_DIR}" ]; then
+    add_check "overlay:secrets" "false" "true" "overlay is not configured; set --overlay PATH"
+    add_check "cloudflare:tunnel-token" "false" "true" "overlay secrets are not configured"
+    return
+  fi
+
   local env_file="${SECRETS_DIR}/cloudlared.env"
   if [ ! -f "$env_file" ] && [ -f "${SECRETS_DIR}/cloudflared.env" ]; then
     env_file="${SECRETS_DIR}/cloudflared.env"
@@ -57,6 +65,17 @@ cloudflare_token_check() {
   fi
 }
 
+feature_dir_check() {
+  local name="$1"
+  local required="$2"
+  local path="$3"
+  if [ -d "$path" ]; then
+    add_check "feature:${name}" "true" "$required" "$path"
+  else
+    add_check "feature:${name}" "false" "$required" "$path is missing (unconfigured)"
+  fi
+}
+
 tool_check "ssh" "true"
 tool_check "python3" "true"
 tool_check "jq" "false"
@@ -65,7 +84,10 @@ tool_check "ansible-playbook" "false"
 tool_check "packer" "false"
 tool_check "cloudflared" "false"
 
-file_present_check "config:hosts-inventory" "false" "${ROOT}/inventory/hosts"
+feature_dir_check "terraform" "false" "${ROOT}/terraform"
+feature_dir_check "ansible" "false" "${ROOT}/ansible"
+feature_dir_check "packer" "false" "${ROOT}/packer"
+file_present_check "config:hosts-inventory" "false" "${INVENTORY_PATH}"
 cloudflare_token_check
 
 doctor_json="$(python3 - "${tmp_checks}" <<'PY'

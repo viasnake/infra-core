@@ -4,11 +4,11 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-SECRETS_FILE="${ROOT}/secrets/cloudlared.env"
+OVERLAY="$(foundry_overlay_root)"
+SECRETS_FILE="$(foundry_path_join "${OVERLAY}" "secrets/cloudlared.env")"
 
-if [ ! -f "${SECRETS_FILE}" ] && [ -f "${ROOT}/secrets/cloudflared.env" ]; then
-  SECRETS_FILE="${ROOT}/secrets/cloudflared.env"
+if [ -n "${OVERLAY}" ] && [ ! -f "${SECRETS_FILE}" ] && [ -f "${OVERLAY}/secrets/cloudflared.env" ]; then
+  SECRETS_FILE="${OVERLAY}/secrets/cloudflared.env"
 fi
 
 zt_snapshot_json() {
@@ -19,7 +19,7 @@ zt_snapshot_json() {
     has_cloudflared="true"
   fi
 
-  if [ -f "${SECRETS_FILE}" ] && grep -q '^TUNNEL_TOKEN=.' "${SECRETS_FILE}"; then
+  if [ -n "${SECRETS_FILE}" ] && [ -f "${SECRETS_FILE}" ] && grep -q '^TUNNEL_TOKEN=.' "${SECRETS_FILE}"; then
     has_token="true"
   fi
 

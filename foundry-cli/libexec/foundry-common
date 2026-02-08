@@ -150,6 +150,49 @@ foundry_require_arg() {
   fi
 }
 
+foundry_root() {
+  if [ -n "${FOUNDRY_ROOT:-}" ]; then
+    printf '%s\n' "${FOUNDRY_ROOT}"
+    return 0
+  fi
+  pwd
+}
+
+foundry_overlay_root() {
+  if [ -n "${OVERLAY_ROOT:-}" ]; then
+    printf '%s\n' "${OVERLAY_ROOT}"
+    return 0
+  fi
+
+  local base
+  base="$(foundry_root)"
+  if [ -d "${base}/overlay" ]; then
+    printf '%s\n' "${base}/overlay"
+    return 0
+  fi
+
+  printf '\n'
+}
+
+foundry_path_join() {
+  local root="$1"
+  local leaf="$2"
+  if [ -z "$root" ]; then
+    printf '\n'
+    return 0
+  fi
+  printf '%s/%s\n' "${root%/}" "${leaf#/}"
+}
+
+foundry_feature_state() {
+  local path="$1"
+  if [ -e "$path" ]; then
+    printf 'configured\n'
+  else
+    printf 'unconfigured\n'
+  fi
+}
+
 foundry_run() {
   if [ "${FOUNDRY_TRACE:-0}" = "1" ]; then
     printf 'RUN: %s\n' "$*" >&2

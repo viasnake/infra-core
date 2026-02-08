@@ -4,7 +4,7 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+ROOT="$(foundry_root)"
 
 if ! foundry_has_command ansible-playbook; then
   foundry_fail 1 true "ansible-playbook command is missing"

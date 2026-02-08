@@ -6,7 +6,7 @@ cat <<'EOF'
 foundry - unified operations entrypoint
 
 Usage:
-  foundry [--output human|json|yaml] <command> [args]
+  foundry [--root PATH] [--overlay PATH] [--output human|json|yaml] <command> [args]
 
 Commands:
   doctor

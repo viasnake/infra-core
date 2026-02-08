@@ -1,0 +1,4 @@
+[tools]
+python = "3.12"
+jq = "1.8.1"
+shellcheck = "latest"

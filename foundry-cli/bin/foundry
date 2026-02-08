@@ -3,8 +3,8 @@
 set -euo pipefail
 
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "${SELF_DIR}/.." && pwd)"
-LIBEXEC_DIR="${ROOT_DIR}/libexec"
+INSTALL_ROOT="$(cd "${SELF_DIR}/.." && pwd)"
+LIBEXEC_DIR="${INSTALL_ROOT}/libexec"
 
 if [ "$#" -eq 0 ]; then
   "${LIBEXEC_DIR}/foundry-help"
@@ -12,10 +12,34 @@ if [ "$#" -eq 0 ]; then
 fi
 
 OUTPUT_FORMAT="human"
+ROOT_DIR="${FOUNDRY_ROOT:-$(pwd)}"
+OVERLAY_DIR="${OVERLAY_ROOT:-}"
 ARGS=()
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
+  --root)
+    shift
+    if [ "$#" -eq 0 ]; then
+      echo "missing value for --root" >&2
+      exit 2
+    fi
+    ROOT_DIR="$1"
+    ;;
+  --root=*)
+    ROOT_DIR="${1#--root=}"
+    ;;
+  --overlay)
+    shift
+    if [ "$#" -eq 0 ]; then
+      echo "missing value for --overlay" >&2
+      exit 2
+    fi
+    OVERLAY_DIR="$1"
+    ;;
+  --overlay=*)
+    OVERLAY_DIR="${1#--overlay=}"
+    ;;
   --output)
     shift
     if [ "$#" -eq 0 ]; then
@@ -51,5 +75,6 @@ fi
 
 export FOUNDRY_OUTPUT="${OUTPUT_FORMAT}"
 export FOUNDRY_ROOT="${ROOT_DIR}"
+export OVERLAY_ROOT="${OVERLAY_DIR}"
 
 exec "${TARGET}" "${REST[@]}"

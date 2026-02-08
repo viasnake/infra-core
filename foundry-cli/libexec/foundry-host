@@ -4,8 +4,9 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-INVENTORY_DIR="${ROOT}/inventory/hosts"
+ROOT="$(foundry_root)"
+OVERLAY="$(foundry_overlay_root)"
+INVENTORY_DIR="$(foundry_path_join "${OVERLAY}" "inventory/hosts")"
 PROVIDER_REGISTRY="${ROOT}/providers/registry.txt"
 
 list_hosts_json() {
@@ -168,14 +169,14 @@ shift || true
 
 case "$subcommand" in
 list)
-  if [ ! -d "$INVENTORY_DIR" ]; then
+  if [ -z "${INVENTORY_DIR}" ] || [ ! -d "$INVENTORY_DIR" ]; then
     foundry_fail 1 true "inventory directory not found: ${INVENTORY_DIR}"
   fi
   payload="$(list_hosts_json)"
   foundry_emit_object "$payload" host_list_human
   ;;
 inspect)
-  if [ ! -d "$INVENTORY_DIR" ]; then
+  if [ -z "${INVENTORY_DIR}" ] || [ ! -d "$INVENTORY_DIR" ]; then
     foundry_fail 1 true "inventory directory not found: ${INVENTORY_DIR}"
   fi
   host="${1:-}"

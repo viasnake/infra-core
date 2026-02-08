@@ -4,8 +4,8 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-INVENTORY_DIR="${ROOT}/inventory/hosts"
+OVERLAY="$(foundry_overlay_root)"
+INVENTORY_DIR="$(foundry_path_join "${OVERLAY}" "inventory/hosts")"
 
 exec_ssh() {
   local host="${1:-}"
@@ -14,9 +14,13 @@ exec_ssh() {
 
   local target_host="$host"
   local target_user="infra"
-  local host_file="${INVENTORY_DIR}/${host}.env"
+  local host_file=""
 
-  if [ -f "$host_file" ]; then
+  if [ -n "${INVENTORY_DIR}" ]; then
+    host_file="${INVENTORY_DIR}/${host}.env"
+  fi
+
+  if [ -n "${host_file}" ] && [ -f "$host_file" ]; then
     # shellcheck disable=SC1090
     source "$host_file"
     target_host="${HOST_ADDRESS:-$host}"

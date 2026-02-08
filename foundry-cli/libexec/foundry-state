@@ -4,8 +4,6 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-
 state_payload() {
   local backend="external"
   local hint="configure remote backend in terraform files and CI/operator environment"
