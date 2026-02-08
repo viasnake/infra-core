@@ -4,4 +4,34 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-foundry_fail 3 true "state command not implemented"
+ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+
+state_payload() {
+  local backend="external"
+  local hint="configure remote backend in terraform files and CI/operator environment"
+  printf '{"command":"state","ownership":"outside-foundry","backend":"%s","hint":"%s"}\n' "$backend" "$hint"
+}
+
+state_human() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+data = json.loads(sys.argv[1])
+print("Foundry state")
+print("- ownership: {}".format(data["ownership"]))
+print("- backend: {}".format(data["backend"]))
+print("- hint: {}".format(data["hint"]))
+PY
+}
+
+subcommand="${1:-status}"
+case "$subcommand" in
+status | where)
+  payload="$(state_payload)"
+  foundry_emit_object "$payload" state_human
+  ;;
+*)
+  foundry_fail 2 false "usage: foundry state [status|where]"
+  ;;
+esac
