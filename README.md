@@ -64,6 +64,15 @@ bin/foundry doctor --output json
 bin/foundry host list --output yaml
 ```
 
+## CI/CD
+
+GitHub Actions workflows are defined in:
+
+- `.github/workflows/ci.yml`
+- `.github/workflows/release.yml`
+
+Operational details are documented in `docs/cicd.md`.
+
 ## Migration Note
 
 This repository evolves `infra-core` toward `foundry` while retaining existing assets.
