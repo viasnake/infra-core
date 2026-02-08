@@ -2,8 +2,13 @@
 
 set -euo pipefail
 
+SELF_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+
 if command -v foundry >/dev/null 2>&1; then
-  exec foundry "$@"
+  FOUND_BIN="$(command -v foundry)"
+  if [ "$(readlink -f "${FOUND_BIN}")" != "$(readlink -f "${SELF_PATH}")" ]; then
+    exec foundry "$@"
+  fi
 fi
 
 echo "foundry CLI is required but not installed." >&2
