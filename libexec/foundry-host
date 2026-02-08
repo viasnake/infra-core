@@ -4,4 +4,154 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
 
-foundry_fail 3 true "host command not implemented"
+ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+INVENTORY_DIR="${ROOT}/inventory/hosts"
+
+list_hosts_json() {
+  python3 - "$INVENTORY_DIR" <<'PY'
+import glob
+import json
+import os
+import sys
+
+inventory_dir = sys.argv[1]
+hosts = []
+
+for path in sorted(glob.glob(os.path.join(inventory_dir, "*.env"))):
+    item = {
+        "name": os.path.splitext(os.path.basename(path))[0],
+        "address": "",
+        "user": "infra",
+        "provider": "unknown",
+        "tags": [],
+    }
+    with open(path, "r", encoding="utf-8") as f:
+        for raw in f:
+            raw = raw.strip()
+            if not raw or raw.startswith("#") or "=" not in raw:
+                continue
+            key, value = raw.split("=", 1)
+            value = value.strip().strip('"').strip("'")
+            if key == "HOST_NAME" and value:
+                item["name"] = value
+            elif key == "HOST_ADDRESS":
+                item["address"] = value
+            elif key == "HOST_USER" and value:
+                item["user"] = value
+            elif key == "HOST_PROVIDER" and value:
+                item["provider"] = value
+            elif key == "HOST_TAGS" and value:
+                item["tags"] = [x for x in value.split(",") if x]
+    hosts.append(item)
+
+print(json.dumps({"command": "host list", "hosts": hosts}, separators=(",", ":")))
+PY
+}
+
+host_list_human() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+data = json.loads(sys.argv[1])
+hosts = data.get("hosts", [])
+if not hosts:
+    print("no hosts in inventory")
+    raise SystemExit(0)
+
+print("Foundry hosts")
+for host in hosts:
+    tags = ",".join(host.get("tags", []))
+    print("- {name} {user}@{address} provider={provider} tags={tags}".format(
+        name=host.get("name", "unknown"),
+        user=host.get("user", "infra"),
+        address=host.get("address", ""),
+        provider=host.get("provider", "unknown"),
+        tags=tags or "-",
+    ))
+PY
+}
+
+host_inspect_json() {
+  local host="$1"
+  local file="${INVENTORY_DIR}/${host}.env"
+  if [ ! -f "$file" ]; then
+    foundry_fail 1 false "host not found in inventory: ${host}"
+  fi
+
+  python3 - "$file" <<'PY'
+import json
+import os
+import sys
+
+path = sys.argv[1]
+name = os.path.splitext(os.path.basename(path))[0]
+data = {
+    "name": name,
+    "address": "",
+    "user": "infra",
+    "provider": "unknown",
+    "tags": [],
+    "raw": {},
+}
+
+with open(path, "r", encoding="utf-8") as f:
+    for raw in f:
+        raw = raw.strip()
+        if not raw or raw.startswith("#") or "=" not in raw:
+            continue
+        key, value = raw.split("=", 1)
+        value = value.strip().strip('"').strip("'")
+        data["raw"][key] = value
+        if key == "HOST_NAME" and value:
+            data["name"] = value
+        elif key == "HOST_ADDRESS":
+            data["address"] = value
+        elif key == "HOST_USER" and value:
+            data["user"] = value
+        elif key == "HOST_PROVIDER" and value:
+            data["provider"] = value
+        elif key == "HOST_TAGS" and value:
+            data["tags"] = [x for x in value.split(",") if x]
+
+print(json.dumps({"command": "host inspect", "host": data}, separators=(",", ":")))
+PY
+}
+
+host_inspect_human() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+data = json.loads(sys.argv[1])["host"]
+print("Foundry host inspect")
+print("- name: {}".format(data.get("name", "unknown")))
+print("- address: {}".format(data.get("address", "")))
+print("- user: {}".format(data.get("user", "infra")))
+print("- provider: {}".format(data.get("provider", "unknown")))
+print("- tags: {}".format(",".join(data.get("tags", [])) or "-"))
+PY
+}
+
+if [ ! -d "$INVENTORY_DIR" ]; then
+  foundry_fail 1 true "inventory directory not found: ${INVENTORY_DIR}"
+fi
+
+subcommand="${1:-}"
+shift || true
+
+case "$subcommand" in
+list)
+  payload="$(list_hosts_json)"
+  foundry_emit_object "$payload" host_list_human
+  ;;
+inspect)
+  host="${1:-}"
+  foundry_require_arg "$host" "usage: foundry host inspect <host>"
+  payload="$(host_inspect_json "$host")"
+  foundry_emit_object "$payload" host_inspect_human
+  ;;
+*)
+  foundry_fail 2 false "usage: foundry host <list|inspect>"
+  ;;
+esac
