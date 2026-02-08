@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
+
+ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+INVENTORY_DIR="${ROOT}/inventory/hosts"
+
+exec_ssh() {
+  local host="${1:-}"
+  shift || true
+  foundry_require_arg "$host" "usage: foundry exec ssh <host> [ssh args...]"
+
+  local target_host="$host"
+  local target_user="infra"
+  local host_file="${INVENTORY_DIR}/${host}.env"
+
+  if [ -f "$host_file" ]; then
+    # shellcheck disable=SC1090
+    source "$host_file"
+    target_host="${HOST_ADDRESS:-$host}"
+    target_user="${HOST_USER:-infra}"
+  fi
+
+  if ! foundry_has_command ssh; then
+    foundry_fail 1 true "ssh command is missing"
+  fi
+
+  if [ "$(foundry_output_format)" = "human" ]; then
+    printf 'opening ssh session: %s@%s\n' "$target_user" "$target_host" >&2
+  fi
+
+  exec ssh "$@" "${target_user}@${target_host}"
+}
+
+exec_terraform() {
+  if ! foundry_has_command terraform; then
+    foundry_fail 1 true "terraform command is missing"
+  fi
+
+  if [ "$#" -eq 0 ]; then
+    foundry_fail 2 false "usage: foundry exec terraform <args...>"
+  fi
+
+  exec terraform "$@"
+}
+
+exec_ansible() {
+  if ! foundry_has_command ansible-playbook; then
+    foundry_fail 1 true "ansible-playbook command is missing"
+  fi
+
+  if [ "$#" -eq 0 ]; then
+    foundry_fail 2 false "usage: foundry exec ansible <args...>"
+  fi
+
+  exec ansible-playbook "$@"
+}
+
+subcommand="${1:-}"
+shift || true
+
+case "$subcommand" in
+ssh)
+  exec_ssh "$@"
+  ;;
+terraform)
+  exec_terraform "$@"
+  ;;
+ansible)
+  exec_ansible "$@"
+  ;;
+*)
+  foundry_fail 2 false "usage: foundry exec <ssh|terraform|ansible> ..."
+  ;;
+esac

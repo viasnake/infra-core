@@ -1,22 +1,82 @@
-# infra
+# Foundry
 
-インフラに関するコードを管理するリポジトリです。
+Foundry is a monolithic operations distribution for a single operations host.
 
-## ディレクトリ構成
+- Single entrypoint: `foundry`
+- Mandatory control plane: Cloudflare Zero Trust
+- Unified operation flow for image, host, convergence, and escape hatches
 
-- `scripts/`: インフラに関するスクリプトを管理するディレクトリです。
-- `cloud-init/`: cloud-init の設定ファイルを管理するディレクトリです。
-- `ansible/`: Ansible のコードを管理するディレクトリです。
-- `terraform/`: Terraform のコードを管理するディレクトリです。
+## Repository Layout
 
-## git clone
+- `bin/foundry`: single CLI entrypoint
+- `libexec/`: small UNIX-style command units (`foundry-*`)
+- `docs/`: contract and CLI contract
+- `packer/`: base image templates
+- `terraform/`: provider-neutral infrastructure entrypoints
+- `ansible/`: convergence playbooks
+- `cloud-init/`: bootstrap-only assets
+- `inventory/hosts`: host inventory (`.env` per host)
+
+## Toolchain Management
+
+Foundry manages external dependencies with `mise`.
 
 ```bash
-git clone --recursive git@github.com:alflag-team/infra-core.git
+mise install
+mise exec -- bin/foundry version
 ```
 
-## submodule の更新
+## Command Taxonomy
+
+```text
+foundry
+├─ doctor
+├─ image
+├─ host
+├─ converge
+├─ zt
+├─ state
+├─ secret
+├─ exec
+└─ version
+```
+
+## Phase 0 Commands
+
+- `bin/foundry version`
+- `bin/foundry doctor`
+- `bin/foundry zt doctor`
+- `bin/foundry exec ssh <host>`
+
+## Phase 1 Commands
+
+- `bin/foundry image build`
+- `bin/foundry converge`
+- `bin/foundry host list`
+- `bin/foundry host inspect <host>`
+
+## Output Contract
+
+All commands accept `--output human|json|yaml`.
 
 ```bash
-git submodule update --init --recursive
+bin/foundry doctor --output json
+bin/foundry host list --output yaml
 ```
+
+## CI/CD
+
+GitHub Actions workflows are defined in:
+
+- `.github/workflows/ci.yml`
+- `.github/workflows/release.yml`
+
+Operational details are documented in `docs/cicd.md`.
+
+## Migration Note
+
+This repository evolves `infra-core` toward `foundry` while retaining existing assets.
+Contracts are source-of-truth in:
+
+- `docs/contract.md`
+- `docs/cli-contract.md`

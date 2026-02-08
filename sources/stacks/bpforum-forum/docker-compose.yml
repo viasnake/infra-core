@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mariadb:10.5
+    networks:
+     - local
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: flarum
+      MYSQL_USER: flarum
+      MYSQL_PASSWORD: &db_password ${MYSQL_PASSWORD}
+    volumes:
+      - type: bind
+        source: "/mnt/shared/bpforum-forum/mysql"
+        target: "/var/lib/mysql"
+
+  flarum:
+    image: ghcr.io/viasnake/flarum:stable
+    networks:
+      - public
+      - local
+    environment:
+      DEBUG: "false"
+      FORUM_URL: https://bp-forum.net
+      DB_HOST: db
+      DB_NAME: flarum
+      DB_USER: flarum
+      DB_PASS: *db_password
+      DB_PREF: flarum_
+      DB_PORT: 3306
+      # FLARUM_ADMIN_USER: admin
+      # FLARUM_ADMIN_PASS: ${FLARUM_ADMIN_PASS}
+      # FLARUM_ADMIN_MAIL: admin@alflag.org
+      FLARUM_TITLE: BlueProtocol Forum
+    volumes:
+      - type: bind
+        source: "/mnt/shared/bpforum-forum/flarum/assets"
+        target: "/flarum/app/public/assets"
+      - type: bind
+        source: "/mnt/shared/bpforum-forum/flarum/extensions"
+        target: "/flarum/app/extensions"
+      - type: bind
+        source: "/mnt/shared/bpforum-forum/flarum/logs"
+        target: "/flarum/app/storage/logs"
+      - type: bind
+        source: "/mnt/shared/bpforum-forum/nginx"
+        target: "/etc/nginx/flarum"
+    deploy:
+      labels:
+        caddy: bp-forum.net
+        caddy.reverse_proxy: "{{upstreams 8888}}"
+        caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
+
+networks:
+  public:
+    external: true
+  local:
+    driver: overlay

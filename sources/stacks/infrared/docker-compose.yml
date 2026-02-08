@@ -1,0 +1,33 @@
+version: '3.8'
+
+x-envionment:
+  infrared:
+    &infrared
+    INFRARED_CONFIG_PATH: /configs
+
+services:
+  infrared:
+    image: viasnake/infrared-arm64:latest
+    ports:
+      - published: 25565
+        target: 25565
+        protocol: tcp
+        mode: ingress
+    networks:
+      - public
+    volumes:
+      - type: bind
+        source: "/mnt/shared/infrared/configs"
+        target: "/configs"
+    environment:
+      <<: *infrared
+    deploy:
+      replicas: 2
+      placement:
+        max_replicas_per_node: 2
+        constraints:
+          - node.role == worker
+
+networks:
+  public:
+    external: true

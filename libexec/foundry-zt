@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
+
+ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+SECRETS_FILE="${ROOT}/secrets/cloudlared.env"
+COMPOSE_FILE="${ROOT}/tools/docker/cloudflared/compose.yaml"
+
+if [ ! -f "${SECRETS_FILE}" ] && [ -f "${ROOT}/secrets/cloudflared.env" ]; then
+  SECRETS_FILE="${ROOT}/secrets/cloudflared.env"
+fi
+
+zt_snapshot_json() {
+  local has_cloudflared="false"
+  local has_compose="false"
+  local has_token="false"
+
+  if foundry_has_command cloudflared; then
+    has_cloudflared="true"
+  fi
+
+  if [ -f "${COMPOSE_FILE}" ]; then
+    has_compose="true"
+  fi
+
+  if [ -f "${SECRETS_FILE}" ] && grep -q '^TUNNEL_TOKEN=.' "${SECRETS_FILE}"; then
+    has_token="true"
+  fi
+
+  local ready="false"
+  if [ "${has_compose}" = "true" ] && [ "${has_token}" = "true" ]; then
+    ready="true"
+  fi
+
+  printf '{"command":"zt","control_plane":"cloudflare-zero-trust","ready":%s,"retryable":true,"checks":{"cloudflared_binary":%s,"compose_file":%s,"tunnel_token":%s}}\n' \
+    "$(foundry_bool_json "${ready}")" \
+    "$(foundry_bool_json "${has_cloudflared}")" \
+    "$(foundry_bool_json "${has_compose}")" \
+    "$(foundry_bool_json "${has_token}")"
+}
+
+zt_human() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+data = json.loads(sys.argv[1])
+print("Foundry zt status")
+print("- control plane: {}".format(data["control_plane"]))
+print("- ready: {}".format("yes" if data["ready"] else "no"))
+for name, ok in data["checks"].items():
+    print("- [{}] {}".format("ok" if ok else "fail", name))
+PY
+}
+
+cmd="${1:-doctor}"
+case "$cmd" in
+doctor)
+  payload="$(zt_snapshot_json)"
+  foundry_emit_object "$payload" zt_human
+  if ! python3 - "$payload" <<'PY'
+import json
+import sys
+obj = json.loads(sys.argv[1])
+raise SystemExit(0 if obj.get("ready") else 1)
+PY
+  then
+    exit 1
+  fi
+  ;;
+status)
+  payload="$(zt_snapshot_json)"
+  foundry_emit_object "$payload" zt_human
+  ;;
+apply)
+  payload="$(zt_snapshot_json)"
+  if [ "$(python3 - "$payload" <<'PY'
+import json
+import sys
+obj = json.loads(sys.argv[1])
+print("yes" if obj.get("ready") else "no")
+PY
+)" = "no" ]; then
+    foundry_fail 1 true "cloudflare zero trust prerequisites are not met"
+  fi
+
+  if [ "$(foundry_output_format)" = "human" ]; then
+    printf 'Cloudflare Zero Trust configuration validated.\n'
+    printf 'Apply is intentionally safe-by-default; no remote mutation performed.\n'
+    printf 'Use `cloudflared tunnel run` through your operator workflow.\n'
+  else
+    foundry_emit_json '{"command":"zt apply","applied":false,"mode":"safe","message":"validated only"}'
+  fi
+  ;;
+*)
+  foundry_fail 2 false "usage: foundry zt [doctor|status|apply]"
+  ;;
+esac

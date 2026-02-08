@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/foundry-common"
+
+ROOT="${FOUNDRY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+SECRETS_DIR="${ROOT}/secrets"
+
+tmp_checks="$(mktemp)"
+trap 'rm -f "${tmp_checks}"' EXIT
+
+add_check() {
+  local name="$1"
+  local ok="$2"
+  local required="$3"
+  local detail="$4"
+  printf '%s\t%s\t%s\t%s\n' "$name" "$ok" "$required" "$detail" >>"${tmp_checks}"
+}
+
+tool_check() {
+  local cmd="$1"
+  local required="$2"
+  local version_flag="${3:---version}"
+  if foundry_has_command "$cmd"; then
+    add_check "tool:${cmd}" "true" "$required" "$(foundry_command_version "$cmd" "$version_flag")"
+  else
+    add_check "tool:${cmd}" "false" "$required" "missing"
+  fi
+}
+
+file_present_check() {
+  local name="$1"
+  local required="$2"
+  local path="$3"
+  if [ -e "$path" ]; then
+    add_check "$name" "true" "$required" "$path"
+  else
+    add_check "$name" "false" "$required" "$path is missing"
+  fi
+}
+
+cloudflare_token_check() {
+  local env_file="${SECRETS_DIR}/cloudlared.env"
+  if [ ! -f "$env_file" ] && [ -f "${SECRETS_DIR}/cloudflared.env" ]; then
+    env_file="${SECRETS_DIR}/cloudflared.env"
+  fi
+  if [ ! -f "$env_file" ]; then
+    add_check "cloudflare:tunnel-token" "false" "true" "${SECRETS_DIR}/cloudlared.env is missing"
+    return
+  fi
+
+  if grep -q '^TUNNEL_TOKEN=.' "$env_file"; then
+    add_check "cloudflare:tunnel-token" "true" "true" "configured"
+  else
+    add_check "cloudflare:tunnel-token" "false" "true" "TUNNEL_TOKEN is empty"
+  fi
+}
+
+tool_check "ssh" "true"
+tool_check "python3" "true"
+tool_check "jq" "false"
+tool_check "terraform" "false"
+tool_check "ansible-playbook" "false"
+tool_check "packer" "false"
+tool_check "cloudflared" "false"
+
+file_present_check "config:cloudflared-compose" "true" "${ROOT}/tools/docker/cloudflared/compose.yaml"
+file_present_check "config:hosts-inventory" "false" "${ROOT}/inventory/hosts"
+cloudflare_token_check
+
+doctor_json="$(python3 - "${tmp_checks}" <<'PY'
+import json
+import sys
+
+checks = []
+required_failures = 0
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    for raw in f:
+        raw = raw.rstrip("\n")
+        if not raw:
+            continue
+        name, ok, required, detail = raw.split("\t", 3)
+        ok_bool = ok == "true"
+        req_bool = required == "true"
+        if req_bool and not ok_bool:
+            required_failures += 1
+        checks.append({
+            "name": name,
+            "ok": ok_bool,
+            "required": req_bool,
+            "detail": detail,
+        })
+
+result = {
+    "command": "doctor",
+    "control_plane": "cloudflare-zero-trust",
+    "required_failures": required_failures,
+    "ok": required_failures == 0,
+    "retryable": True,
+    "checks": checks,
+}
+
+print(json.dumps(result, separators=(",", ":")))
+PY
+)"
+
+doctor_human() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+data = json.loads(sys.argv[1])
+print("Foundry doctor")
+print("- control plane: {}".format(data["control_plane"]))
+print("- required failures: {}".format(data["required_failures"]))
+for check in data["checks"]:
+    marker = "ok" if check["ok"] else "fail"
+    req = "required" if check["required"] else "optional"
+    print("- [{}] {} ({}) - {}".format(marker, check["name"], req, check["detail"]))
+PY
+}
+
+foundry_emit_object "$doctor_json" doctor_human
+
+if ! python3 - "$doctor_json" <<'PY'
+import json
+import sys
+
+doc = json.loads(sys.argv[1])
+raise SystemExit(0 if doc.get("ok") else 1)
+PY
+then
+  exit 1
+fi

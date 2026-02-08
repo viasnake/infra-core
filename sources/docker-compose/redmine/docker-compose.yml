@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+
+  redmine:
+    image: redmine
+    restart: always
+    ports:
+      - 3001:3000
+    environment:
+      REDMINE_DB_MYSQL: host
+      REDMINE_DB_DATABASE: database
+      REDMINE_DB_USERNAME: user
+      REDMINE_DB_PASSWORD: password
+      REDMINE_SECRET_KEY_BASE: key
+      

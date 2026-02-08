@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - feature/**
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-shell:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Install tools
+        run: mise install
+
+      - name: Run shellcheck for Foundry scripts
+        run: |
+          mise exec -- shellcheck \
+            bin/foundry \
+            libexec/foundry-* \
+            tools/scripts/foundry-smoke.sh
+
+  contract-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Install tools
+        run: mise install
+
+      - name: Check required contract docs
+        run: |
+          test -f docs/contract.md
+          test -f docs/cli-contract.md
+
+      - name: Validate version JSON output
+        run: |
+          mise exec -- bin/foundry --output json version | mise exec -- jq -e '.name == "foundry" and .contract == "v1"'
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Install tools
+        run: mise install
+
+      - name: Run Foundry smoke script
+        run: mise exec -- tools/scripts/foundry-smoke.sh
+
+      - name: Verify doctor fails without runtime tunnel secret
+        run: |
+          if mise exec -- bin/foundry doctor >/dev/null 2>&1; then
+            echo "doctor unexpectedly succeeded without tunnel token" >&2
+            exit 1
+          fi

@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  caddy:
+    image: ghcr.io/alflag-team/caddy-cloudflare:latest
+    ports:
+      - published: 80
+        target: 80
+        protocol: tcp
+        mode: ingress
+      - published: 443
+        target: 443
+        protocol: tcp
+        mode: ingress
+    networks:
+     - public
+    volumes:
+      - type: bind
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+      - type: bind
+        source: "/mnt/shared/alflag-caddy/data"
+        target: "/data"
+    environment:
+      CADDY_INGRESS_NETWORKS: public
+    deploy:
+      labels:
+        caddy.email: support@alflag.org
+      placement:
+        constraints:
+         - node.role == manager
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: 200M
+
+networks:
+  public:
+    external: true

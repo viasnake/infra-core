@@ -1,0 +1,100 @@
+version: '3.8'
+
+x-envionment:
+  label:
+    &label
+    caddy: swarmpit.sys.alflag.org
+    caddy.reverse_proxy: "{{upstreams 8080}}"
+    caddy.tls.dns: acme
+
+services:
+  agent:
+    image: swarmpit/agent:latest
+    environment:
+      DOCKER_API_VERSION: '1.35'
+    volumes:
+      - type: bind
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+        read_only: true
+    networks:
+      - local
+    deploy:
+      mode: global
+      labels:
+        swarmpit.agent: 'true'
+      resources:
+        reservations:
+          memory: 32M
+        limits:
+          memory: 64M
+
+  app:
+    image: swarmpit/swarmpit:latest
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8080
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    environment:
+      SWARMPIT_DB: http://couchdb:5984
+      SWARMPIT_INFLUXDB: http://influxdb:8086
+    volumes:
+      - type: bind
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+        read_only: true
+    networks:
+      - public
+      - local
+    deploy:
+      labels:
+        *label
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        reservations:
+          memory: 512M
+        limits:
+          memory: 1024M
+
+  couchdb:
+    image: treehouses/couchdb:2.3.1
+    volumes:
+      - type: bind
+        source: "/mnt/shared/swarmpit/couchdb-data"
+        target: "/opt/couchdb/data"
+    networks:
+      - local
+    deploy:
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          memory: 256M
+
+  influxdb:
+    image: influxdb:1.7
+    volumes:
+      - type: bind
+        source: "/mnt/shared/swarmpit/influx-data"
+        target: "/var/lib/influxdb"
+    networks:
+      - local
+    deploy:
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          memory: 256M
+
+networks:
+  public:
+    external: true
+  local:
+    driver: overlay

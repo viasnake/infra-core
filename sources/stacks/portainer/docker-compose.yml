@@ -1,0 +1,51 @@
+version: '3.8'
+
+x-envionment:
+  label:
+    &label
+    caddy: dash.sys.alflag.org
+    caddy.reverse_proxy: "{{upstreams 9000}}"
+
+services:
+  agent:
+    image: portainer/agent:2.16.1
+    networks:
+      - local
+    volumes:
+      - type: bind
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+      - type: bind
+        source: "/var/lib/docker/volumes"
+        target: "/var/lib/docker/volumes"
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.os == linux
+
+  portainer:
+    image: portainer/portainer-ee:2.16.1
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    networks:
+      - local
+      - public
+    volumes:
+      - type: bind
+        source: "/mnt/shared/portainer"
+        target: "/data"
+    deploy:
+      labels:
+        <<: *label
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  public:
+    external: true
+  local:
+    driver: overlay
+    attachable: true

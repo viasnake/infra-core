@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8
+    networks:
+     - local
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-web/db"
+        target: "/var/lib/mysql"
+    environment:
+      MYSQL_DATABASE: ghost
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: ghost
+      MYSQL_PASSWORD: &db_password ${DB_PASSWORD}
+
+  ghost:
+    image: ghost:5-alpine
+    networks:
+     - public
+     - local
+    volumes:
+      - type: bind
+        source: "/mnt/shared/mcplaynetwork-web/ghost"
+        target: "/var/lib/ghost/content"
+    environment:
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: ghost
+      database__connection__password: *db_password
+      database__connection__database: ghost
+      url: https://www.mcplay.biz
+    deploy:
+      labels:
+        caddy: www.mcplay.biz mcplay.biz
+        caddy.reverse_proxy: "{{upstreams 2368}}"
+        caddy.tls.dns: "cloudflare ${CF_API_TOKEN}"
+
+networks:
+  public:
+    external: true
+  local:
+    driver: overlay

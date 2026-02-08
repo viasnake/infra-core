@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+
+  mcplay:
+    image: ghost:latest
+    container_name: mcplay
+    restart: always
+    ports:
+      - 49601:2368
+    environment:
+      database__client: ${DATABASE_CLIENT}
+      database__connection__host: ${DATABASE_CONNECTION_HOST}
+      database__connection__user: ${DATABASE_CONNECTION_USER}
+      database__connection__password: ${DATABASE_CONNECTION_PASSWORD}
+      database__connection__database: ${DATABASE_CONNECTION_DATABASE}
+      url: ${URL}
+      mail__transport: ${MAIL_TRANSPORT}
+      mail__options__host: ${MAIL_OPTIONS_HOST}
+      mail__options__port: ${MAIL_OPTIONS_PORT}
+      mail__options__auth__user: ${MAIL_OPTIONS_AUTH_USER}
+      mail__options__auth__pass: ${MAIL_OPTIONS_AUTH_PASS}
+      mail__from: ${MAIL_FROM}
+    volumes:
+      - mcplay-data:/var/lib/ghost/content
+
+volumes:
+  mcplay-data:
+    external: true
