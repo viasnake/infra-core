@@ -25,6 +25,23 @@ This manifest defines the infrastructure/operations repositories to consolidate 
 | `alflag-team/stacks` | `master` | `sources/stacks` |
 | `alflag-team/etc` | `dns100` | `sources/etc` |
 
+## Import Status (this branch)
+
+| Source repository | Status |
+| --- | --- |
+| `alflag-team/ansible` | imported |
+| `alflag-team/terraform-proxmox` | imported |
+| `alflag-team/terraform-oraclecloud` | imported |
+| `alflag-team/terraform-googlecloud` | imported |
+| `alflag-team/terraform-tfe` | imported |
+| `alflag-team/terraform-cloudflare-access` | imported |
+| `alflag-team/terraform-cloudflare-tunnel` | imported |
+| `alflag-team/terraform-dns` | imported |
+| `alflag-team/docker-compose` | imported |
+| `alflag-team/caddy-with-cloudflare` | imported |
+| `alflag-team/stacks` | imported |
+| `alflag-team/etc` | imported |
+
 ## Migration Process
 
 1. Import each repository with history using `git subtree add`.
